@@ -21,6 +21,7 @@ const extractAsset = (str) => {
 
 
 const getFileName = (str) => {
+  // console.log(str)
   return str.replace(/(.*)\//, '');
 };
 
