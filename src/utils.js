@@ -204,9 +204,9 @@ const createOptionFromCli = (program) => {
   
   let configValue = {}
   const config = program.config;
-  
+  const currentDirection = process.cwd();
   if (config) {
-    const configFileAddress = path.join(__dirname,`../${config}`);
+    const configFileAddress = path.join(currentDirection,`${config}`);
     configValue = require(configFileAddress);
   }
   

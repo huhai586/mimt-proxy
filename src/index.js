@@ -14,8 +14,8 @@ program
   .version('1.0.0', '-v, --version')
   .option('-p, --port [value]', '代理服务器运行的端口，默认6789', 6789)
   .option('-h, --proxyedHostname [value]', '只对只对指定hostname的资源进行本地请求,默认stnew03.beisen.com', "stnew03.beisen.com")
-  .option('-o --localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')
-  .option('-o --config [value]', '代理配置文件')
+  .option('-local --localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')
+  .option('-c --config [value]', '代理配置文件')
   .parse(process.argv);
 
 let {localServerHostName, port, proxyedHostname, excludePattern} = createOptionFromCli(program);
