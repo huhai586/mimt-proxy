@@ -1,9 +1,10 @@
-const {requestWebpackDevServer, requestRealTarget} = require("./requestWebpackDevServer");
+const {requestWebpackDevServer} = require("./requestWebpackDevServer");
+const {requestRealTarget, isUrlNeedRequestLocal} = require('./utils');
 const url = require('url');
-const {optionsForLocalRequest} = require("./const");
+const {createOptionsForLocalRequest} = require("./utils");
 
 
-const proxyForHttp = (req,res,host) => {
+const proxyForHttp = (req,res, proxyedHostname,excludePattern) => {
   // 解析客户端请求
   var urlObject = url.parse(req.url);
   let options =  {
@@ -18,13 +19,14 @@ const proxyForHttp = (req,res,host) => {
   // 为了方便起见，直接去掉客户端请求所支持的压缩方式
   delete options.headers['accept-encoding'];
   
-  console.log(`请求方式：${options.method}，请求地址：${options.protocol}//${options.hostname}:${options.port}${options.path}`);
+  console.log(`http请求方式：${options.method}，请求地址：${options.protocol}//${options.hostname}:${options.port}${options.path}`);
   
   // 请求webpack-dev-server 服务文件list;
-  
-  if (options.hostname === 'stnew03.beisen.com') {
+  // 如果请求域名 + 域名的path 未在exclude名单内，那么就requestLocal
+  const urlNeedRequestLocal = isUrlNeedRequestLocal(options.path, excludePattern);
+  if (options.hostname === proxyedHostname && urlNeedRequestLocal) {
     // console.log(`本地请求地址：${optionsForLocalRequest.method}，请求地址：${optionsForLocalRequest.protocol}//${optionsForLocalRequest.hostname}:${optionsForLocalRequest.port}${optionsForLocalRequest.path}`);
-    requestWebpackDevServer(optionsForLocalRequest, res, req, host);
+    requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
   } else {
     requestRealTarget(options, req, res)
   }

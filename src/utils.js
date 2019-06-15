@@ -1,4 +1,8 @@
-var net = require('net');
+const path = require('path');
+const http = require('http');
+const url = require('url');
+const https = require('https');
+
 
 const extractAsset = (str) => {
   if (str === undefined) {
@@ -119,8 +123,107 @@ const matchResource = (fileNameInPieces, linkHash) => {
   }
 }
 
+const isUrlNeedRequestLocal = (urlPath, excludeArray) => {
+  return !excludeArray.some((rule) => {
+    //判断rule是否match url
+    const ruleInreg = new RegExp(rule);
+    return ruleInreg.test(urlPath);
+    
+  })
+}
+
+
+const requestRealTarget =  (options,req, res, isHttp = true) => {
+  // 根据客户端请求，向真正的目标服务器发起请求。
+  let chunkCount = 0;
+  let httpMethod = isHttp ? http : https;
+  let realReq = httpMethod.request(options, (realRes) => {
+    
+    // 设置客户端响应的http头部
+    Object.keys(realRes.headers).forEach(function(key) {
+      res.setHeader(key, realRes.headers[key]);
+    });
+    
+    res.setHeader('Warning', "this file is from proxy server");
+    // res.setHeader('Pragma', "no-cache");
+    
+    // 设置客户端响应状态码
+    res.writeHead(realRes.statusCode);
+    realRes.on('data', () => {
+      // console.log('Receiving chunk', ++chunkCount)
+    })
+    // 通过pipe的方式把真正的服务器响应内容转发给客户端
+    realRes.pipe(res);
+  });
+  
+  // 通过pipe的方式把客户端请求内容转发给目标服务器
+  req.pipe(realReq);
+  
+  realReq.on('error', (e) => {
+    console.error(e);
+  })
+  realReq.on('end', (e) => {
+    console.log('当前传输完毕');
+  })
+}
+
+
+/**
+ * 设置默认参数
+ * **/
+const createOptionsForLocalRequest = {
+  init: function(localServerHostName){
+    const urlOption = url.parse(localServerHostName);
+    
+    const {hostName, port, protocol} = urlOption;
+    this.hostName = hostName;
+    this.port = port;
+    this.protocol = protocol;
+  },
+  optionsDefault: {
+    protocol: 'http:',
+    hostname: "localhost",
+    method: 'GET',
+    port: 3000,
+    path: '/webpack-dev-server'
+  },
+  getOptions: function(){
+    const {optionsDefault} = this;
+    return {
+      protocol: this.protocol || optionsDefault.protocol,
+      hostname: this.hostname || optionsDefault.hostname,
+      port: this.port || optionsDefault.port,
+      path: optionsDefault.path,
+      method: optionsDefault.method
+    }
+  }
+};
+
+
+const createOptionFromCli = (program) => {
+  
+  let configValue = {}
+  const config = program.config;
+  
+  if (config) {
+    const configFileAddress = path.join(__dirname,`../${config}`);
+    configValue = require(configFileAddress);
+  }
+  
+  let options = {
+    localServerHostName: program.localServerHostName || configValue.localServerHostName,
+    port: program.port || configValue.port,
+    proxyedHostname: program.proxyedHostname || configValue.proxyedHostname,
+    excludePattern: configValue.excludePattern || [],
+  }
+  return options;
+}
 
 exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;
 exports.matchResource = matchResource;
+exports.isUrlNeedRequestLocal = isUrlNeedRequestLocal;
+exports.requestRealTarget = requestRealTarget;
+exports.createOptionsForLocalRequest = createOptionsForLocalRequest;
+exports.createOptionFromCli = createOptionFromCli;

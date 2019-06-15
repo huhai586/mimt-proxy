@@ -7,8 +7,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const {requestWebpackDevServer} = require("./requestWebpackDevServer");
-const {optionsForLocalRequest} = require("./const");
-
+const {isUrlNeedRequestLocal, requestRealTarget, createOptionsForLocalRequest} = require('./utils');
 const caCertPath = path.join(__dirname, './rootCA/rootCA.crt');
 const caKeyPath = path.join(__dirname, './rootCA/rootCA.key.pem');
 
@@ -35,9 +34,9 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @param  {[type]} successFun [description]
  * @return {[type]}            [description]
  */
-function createFakeHttpsWebSite(domain, successFun, host, urlfrag) {
+function createFakeHttpsWebSite(domain, successFun, excludePattern) {
   
-  const fakeCertObj = createFakeCertificateByDomain(caKey, caCert, domain)
+  const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
     key: fakeCertObj.key,
     cert: fakeCertObj.cert
@@ -47,11 +46,25 @@ function createFakeHttpsWebSite(domain, successFun, host, urlfrag) {
     var address = fakeServer.address();
     successFun(address.port);
   });
-  
+  //本地的https server 监听到传入请求
   fakeServer.on('request', (req, res) => {
+    //stnew03 中的资源并不是所有都需要转发
     
-    var urlObject = url.parse(req.url);
-    requestWebpackDevServer(optionsForLocalRequest, res, req, host);
+    const urlNeedRequestLocal = isUrlNeedRequestLocal(req.url, excludePattern);
+    if (urlNeedRequestLocal) {
+      requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
+    } else {
+      // 直接请求
+      let httpsOptions =  {
+        protocol: 'https:',
+        hostname: req.headers.host.split(':')[0],
+        method: req.method,
+        port: req.headers.host.split(':')[1] || 443,
+        path: req.url,
+        headers: req.headers,
+      };
+      requestRealTarget(httpsOptions, req, res, false)
+    }
   });
   fakeServer.on('error', (e) => {
     console.error(e);
@@ -67,6 +80,7 @@ function createFakeHttpsWebSite(domain, successFun, host, urlfrag) {
  * @return {[type]}        [description]
  */
 function createFakeCertificateByDomain(caKey, caCert, domain) {
+  const m1 = new Date().getTime()
   var keys = pki.rsa.generateKeyPair(2046);
   var cert = pki.createCertificate();
   cert.publicKey = keys.publicKey;
@@ -142,7 +156,12 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
   
   var certPem = pki.certificateToPem(cert);
   var keyPem = pki.privateKeyToPem(keys.privateKey);
-  
+  const m2 = new Date().getTime()
+  console.log('生成证书花费时间',Math.floor((m2-m1)/1000))
+  global[domain] = {
+    key: keyPem,
+    cert: certPem
+  }
   return {
     key: keyPem,
     cert: certPem
