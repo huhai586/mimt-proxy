@@ -1,12 +1,13 @@
 {
   "name": "b-proxy-cli",
-  "version": "1.0.10",
-  "description": "一个beisen承载页资源请求转发工具",
+  "version": "1.0.11",
+  "description": "一个bs承载页资源请求转发工具",
   "main": "index.js",
   "dependencies": {
     "commander": "^2.20.0",
-    "express": "^4.16.4",
-    "request": "^2.88.0"
+    "mkdirp": "^0.5.1",
+    "node-forge": "^0.6.49",
+    "through2": "^2.0.1"
   },
   "bin": "./index.js",
   "devDependencies": {},

@@ -16,7 +16,7 @@ const getBody = (response) => {
 };
 
 
-const requestWebpackDevServer = (optionsForLocalRequest, res, req, host) => {
+const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
   let reWDV = http.request(optionsForLocalRequest,  async (WPDresponse) =>{
     let body = await getBody(WPDresponse);
     
@@ -35,11 +35,13 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req, host) => {
       path: matchResourceResult
     };
     
-    if (matchResourceResult !== '') {
+    if (matchResourceResult !== '' && matchResourceResult !== undefined) {
+      console.log(matchResourceResult)
       console.log('已经查找到匹配, 请求参数为',byPassRequestOptions )
       requestRealTarget(byPassRequestOptions, req, res);
     } else {
-      console.log("未能找到匹配文件, 尝试直接访问资源并转发", fileNameWithType);
+      console.log("未能在本地找到匹配文件,", fileNameWithType,'将返回404');
+      res.writeHead(404, {'Content-Type': 'text/plain'})
       res.end();
     }
   });
@@ -66,7 +68,7 @@ const requestRealTarget =  (options,req, res) => {
     // 设置客户端响应状态码
     res.writeHead(realRes.statusCode);
     realRes.on('data', () => {
-      console.log('Receiving chunk', ++chunkCount)
+      // console.log('Receiving chunk', ++chunkCount)
     })
     // 通过pipe的方式把真正的服务器响应内容转发给客户端
     realRes.pipe(res);

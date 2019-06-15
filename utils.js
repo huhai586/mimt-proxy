@@ -85,8 +85,10 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
     if (result.length === 1) {
       console.log('非精确匹配了,',fileNameInPieces.join('.'))
       return linkHash[result[0]]
-    } else {
+    } else if (result.length > 1){
       console.log('多个匹配出现，无法区分')
+    } else if (result.length < 1) {
+      console.log('找不到匹配')
     }
     
   }
