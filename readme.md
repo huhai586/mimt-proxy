@@ -1,32 +1,61 @@
-#### b-proxy-cli 承载页面请求转发工具
+#### b-proxy-cli 
+http/https中间人代理工具
 
     无需对承载页每个资源请求进行配置, 就能对里面的资源请求进行转发
 
+### 使用本软件的前提
+* 代理https服务，需要安装根证书
+* 本地服务器目前仅支持webpack-dev-server启动，不支持其他服务器；
+* 承载页面与本地开发页面，请求的资源文件名大体相似，不能承载页面请求 common.chunk.js 本地却请求main.chunk.js
+
+
+
+###安装
+
+如果要代理https网站，请务必安装根证书，根证书的位置放在模块下面的src/rootCA.crt
+请安装，并选择"完全信任"；
+
+```angular2
+npm install b-proxy-cli -g
+
+```
     
 ###api
-host: 本地资源服务器地址，默认为 -host http://localhost:3000
 
-port: 当前服务器运行的端口，默认为 -port 4000
+| 属性  |说明  | 类型| 必须配置 | 默认值| 
+| ------------ |-------|--------| -----|-----|
+| proxyedHostname | 需要被代理的域名       |    string | no| stnew03.beisen.com
+| port | 代理运行的端口      |    number | no | 6789
+| localServerHostName | 本地工程运行的地址       |    string | no| http://localhost:3000
+| excludePattern | 指定不需要进行代理的path 特征        |   string or regexp string | no | []
+| includePattern | 指定需要进行代理的path 特征        |   string or regexp string | no | []
+| customProxyRules(未完成) | 用户自定义的代理规则  |   rule[] | no | 无
+| config | 配置文件的js地址  |   js | no | 无
 
 ### 运行方法
 
-node index.js -host http://localhost:3000 -p 4000
+* 使用命令行
+    b-proxy-cli 
+    具体参数请使用 b-proxy-cli -h
+* 使用配置文件
+    b-proxy-cli --config configFile.js
     
-###实现功能
+运行起来后，请在系统的http代理中配置代理服务器运行的ip + 端口，
 
+比如： 本地为 localhost:6789
+远程为： 192.168.0.133：6789
+
+如果你不想所有请求都走本代理，可以使用类似SwitchyOmega的工具转发特定域名的请求到本代理
+   
+###实现功能
+* http/https 中间人    
 * 无需对每个资源请求进行正则配置, 就能对里面所有资源请求进行转发
 
-### 使用本软件的前提
 
-* 本地服务器目前仅支持webpack-dev-server启动，不支持其他服务器；
-* 浏览器端需要安装代理设置工具，比如： SwitchyOmega
-* 承载页面与本地开发页面，请求的资源文件名大体相似，不能承载页面请求 common.chunk.js 本地却请求main.chunk.js
-* 
-
-###how it works
+### 无需配置参数就能匹配到本地文件的原理
 
 承载页面发出的请求，被代理工具比如SwitchyOmega转发到本服务器，服务器依据请求的文件名fileName，与http://localhost:port/webpack-dev-server
-列出的文件进行对比，找到能正确匹配fileName的文件url地址，然后让服务器 302重定向到指定的url地址
+列出的文件进行对比，找到能正确匹配fileName的文件url地址，然后转发对应文件数据流到原来的request
 
 
 #### 匹配规则：
@@ -56,10 +85,7 @@ node index.js -host http://localhost:3000 -p 4000
 * 完全交集的匹配规则伪代码： length(A 交集 B) === Math.max(length(A), length(B))；
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
-### todo
-1： 支持自定义规则
 
-2： 
 
   
 

@@ -34,7 +34,7 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @param  {[type]} successFun [description]
  * @return {[type]}            [description]
  */
-function createFakeHttpsWebSite(domain, successFun, excludePattern) {
+function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern) {
   
   const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
@@ -50,7 +50,7 @@ function createFakeHttpsWebSite(domain, successFun, excludePattern) {
   fakeServer.on('request', (req, res) => {
     //stnew03 中的资源并不是所有都需要转发
     
-    const urlNeedRequestLocal = isUrlNeedRequestLocal(req.url, excludePattern);
+    const urlNeedRequestLocal = isUrlNeedRequestLocal(req.url, excludePattern, includePattern);
     if (urlNeedRequestLocal) {
       requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
     } else {

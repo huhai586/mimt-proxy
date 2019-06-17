@@ -81,7 +81,8 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
       }
     });
     const mostMatchFile = mostMatchIndex.map((v) => arr[v]);
-  
+    
+    //todo 感觉有问题
     const result = mostMatchFile.filter((v) => {
      return  splitFileNameInPieces(v).length === fileNameInPieces.length
     });
@@ -99,15 +100,29 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
   
 }
 
-const matchResource = (fileNameInPieces, linkHash) => {
+const matchResource = (fileNameInPieces = '', linkHash) => {
+  if (fileNameInPieces === '') {
+    console.log('异常，需要匹配的文件名为空');
+    return ''
+  };
+  
   const assetFileName = Object.keys(linkHash);
   const matchArr = assetFileName.filter((fileNameLocal) => {
     // fileNameLocal piecely
     const fileNameLocalPiece = splitFileNameInPieces(fileNameLocal);
-    // 将2个数组进行交集操作，判断2个array是否存在全交集
-    const mixedArray = [... new Set([...fileNameInPieces, ...fileNameLocalPiece])];
+  
+    const filtType = fileNameInPieces[fileNameInPieces.length -1];
+    const filtTypeOfFileNameLocal = fileNameLocalPiece[fileNameLocalPiece.length -1];
     
-    return mixedArray.length === Math.max(fileNameInPieces.length , fileNameLocalPiece.length);
+    // 先判断文件类型是否有问题
+    if (filtType !== filtTypeOfFileNameLocal) return false
+    // 将2个数组进行交集操作，判断2个array是否存在全交集
+    // bug fileName 可能有重名，导致依据数量判断的情况下出错
+    const fileNameInPiecesAfterRemoveRepeat = [...new Set([...fileNameInPieces])];
+    const fileNameLocalPieceAfterRemoveRepeat = [...new Set([...fileNameLocalPiece])];
+    const mixedArray = [... new Set([...fileNameInPiecesAfterRemoveRepeat, ...fileNameLocalPieceAfterRemoveRepeat])];
+    
+    return mixedArray.length === Math.max(fileNameInPiecesAfterRemoveRepeat.length , fileNameLocalPieceAfterRemoveRepeat.length);
   });
   
   if (matchArr.length !== 0) {
@@ -123,13 +138,23 @@ const matchResource = (fileNameInPieces, linkHash) => {
   }
 }
 
-const isUrlNeedRequestLocal = (urlPath, excludeArray) => {
-  return !excludeArray.some((rule) => {
+const isMatchInclude = (urlPath, includeArray) => {
+    if (includeArray === undefined || includeArray.length === 0) return true;
+    return includeArray.every((rule) => {
+      //判断rule是否match url
+      const ruleInreg = new RegExp(rule);
+      return ruleInreg.test(urlPath);
+    })
+}
+
+const isUrlNeedRequestLocal = (urlPath, excludeArray, includeArray) => {
+  const matchInclude =  isMatchInclude(urlPath, includeArray)
+  const matchExclude = !excludeArray.some((rule) => {
     //判断rule是否match url
     const ruleInreg = new RegExp(rule);
     return ruleInreg.test(urlPath);
-    
   })
+  return matchExclude && matchInclude
 }
 
 
@@ -215,6 +240,7 @@ const createOptionFromCli = (program) => {
     port: program.port || configValue.port,
     proxyedHostname: program.proxyedHostname || configValue.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
+    includePattern: configValue.includePattern
   }
   return options;
 }

@@ -36,8 +36,7 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
     };
     
     if (matchResourceResult !== '' && matchResourceResult !== undefined) {
-      console.log(matchResourceResult)
-      console.log('已经查找到本地匹配, 请求参数为',byPassRequestOptions )
+      console.log(matchResourceResult,'已经查找到本地匹配, 请求参数为',byPassRequestOptions )
       requestRealTarget(byPassRequestOptions, req, res);
     } else {
       console.log("未能在本地找到匹配文件,", fileNameWithType,'将返回404');

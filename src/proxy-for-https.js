@@ -3,13 +3,13 @@ const net = require('net');
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 
 
-const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern) => {
+const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, includePattern) => {
   // connect to an origin server
   
   // 仅对stenew03.beisen.com来的请求进行修改，其余一律转发
   let srvUrl = url.parse(`http://${req.url}`);
   console.log(`https CONNECT ${srvUrl.hostname}:${srvUrl.port}`);
-  if (srvUrl.port === 3000 || srvUrl.hostnam === 'cloud.italent.link') {
+  if (srvUrl.port === 3000 || srvUrl.hostname === 'cloud.italent.link') {
     console.log('异常');
   }
   if(srvUrl.hostname === proxyedHostname ) {
@@ -28,7 +28,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern) => 
       srvSocket.on('error', (e) => {
         console.error(e);
       });
-    }, excludePattern)
+    }, excludePattern, includePattern)
     
   } else {
     // 对非stnew03.beisen.com的内容直接转发

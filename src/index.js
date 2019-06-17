@@ -13,12 +13,14 @@ const program = require('commander');
 program
   .version('1.0.0', '-v, --version')
   .option('-p, --port [value]', '代理服务器运行的端口，默认6789', 6789)
-  .option('-h, --proxyedHostname [value]', '只对只对指定hostname的资源进行本地请求,默认stnew03.beisen.com', "stnew03.beisen.com")
-  .option('-local --localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')
-  .option('-c --config [value]', '代理配置文件')
+  .option('--proxyedHostname [value]', '只对只对指定hostname的资源进行本地请求,默认stnew03.beisen.com', "stnew03.beisen.com")
+  .option('--localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')
+  .option('--config [value]', '代理配置文件')
+  .option('--includePattern [value]', 'url path必须包含的字符串或者正则，如果包含了，则不走代理')
+  .option('--excludePattern [value]', 'url path不能包含的字符串或者正则，如果包含了，则不走代理')
   .parse(process.argv);
 
-let {localServerHostName, port, proxyedHostname, excludePattern} = createOptionFromCli(program);
+let {localServerHostName, port, proxyedHostname, excludePattern, customProxyRules, includePattern} = createOptionFromCli(program);
 
 //初始化localRequest options
 createOptionsForLocalRequest.init(localServerHostName);
@@ -27,7 +29,7 @@ let httpMitmProxy = new http.Server();
 
 // 代理http请求
 httpMitmProxy.on('request', (req, res) => {
-  ProxyForHttp(req,res,proxyedHostname, excludePattern);
+  ProxyForHttp(req,res,proxyedHostname, excludePattern, customProxyRules);
   res.on('error', () => {
     console.log('响应异常中断')
   })
@@ -37,7 +39,7 @@ httpMitmProxy.on('request', (req, res) => {
 // 代理https请求
 httpMitmProxy.on('connect', (req, cltSocket, head) => {
   console.log('https请求传入...')
-  ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern);
+  ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern);
   cltSocket.on('error', () => {
     console.log('响应异常中断')
   })
