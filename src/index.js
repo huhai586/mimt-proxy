@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 const http = require('http');
-const path = require('path');
-const url = require('url');
 const {createOptionsForLocalRequest, createOptionFromCli} = require('./utils');
 const ProxyForHttp = require("./proxy-for-http");
 const ProxyForHttps = require("./proxy-for-https");
@@ -29,14 +27,14 @@ let httpMitmProxy = new http.Server();
 
 // 代理http请求
 httpMitmProxy.on('request', (req, res) => {
-  ProxyForHttp(req,res,proxyedHostname, excludePattern, customProxyRules);
+  ProxyForHttp(req,res,proxyedHostname, excludePattern, includePattern,customProxyRules);
   res.on('error', () => {
     console.log('响应异常中断')
   })
 });
 
-// https的请求通过http隧道方式转发
 // 代理https请求
+// https的请求通过http隧道方式转发
 httpMitmProxy.on('connect', (req, cltSocket, head) => {
   console.log('https请求传入...')
   ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern);

@@ -4,7 +4,7 @@ const url = require('url');
 const {createOptionsForLocalRequest} = require("./utils");
 
 
-const proxyForHttp = (req,res, proxyedHostname,excludePattern, customProxyRules) => {
+const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, customProxyRules) => {
   // 解析客户端请求
   var urlObject = url.parse(req.url);
   let options =  {
@@ -37,7 +37,7 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern, customProxyRules)
   //   }
   //
   // });
-  const urlNeedRequestLocal = isUrlNeedRequestLocal(options.path, excludePattern);
+  const urlNeedRequestLocal = isUrlNeedRequestLocal(options.path, excludePattern, includePattern);
   if (options.hostname === proxyedHostname && urlNeedRequestLocal) {
     // console.log(`本地请求地址：${optionsForLocalRequest.method}，请求地址：${optionsForLocalRequest.protocol}//${optionsForLocalRequest.hostname}:${optionsForLocalRequest.port}${optionsForLocalRequest.path}`);
     requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
