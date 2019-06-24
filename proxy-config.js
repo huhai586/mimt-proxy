@@ -19,7 +19,7 @@ module.exports={
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "/vendors/ huhai",
+      pathRewriteRule: "vendors huhai",
       byPass: 'http://localhost:3000'
     }
   ]

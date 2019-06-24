@@ -240,7 +240,8 @@ const createOptionFromCli = (program) => {
     port: program.port || configValue.port,
     proxyedHostname: program.proxyedHostname || configValue.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
-    includePattern: configValue.includePattern
+    includePattern: configValue.includePattern,
+    customProxyRules: configValue.customProxyRules
   }
   return options;
 }
