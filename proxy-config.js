@@ -19,8 +19,8 @@ module.exports={
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "vendors huhai",
-      byPass: 'http://localhost:3000'
+      pathRewriteRule: "/(.+)/ /5aV1bjqh_Q23odCf/static/superman/js/lib/jquery-1.10.2_1c4228b8.js",
+      byPass: 'https://ss0.bdstatic.com'
     }
   ]
 }

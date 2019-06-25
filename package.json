@@ -1,6 +1,6 @@
 {
   "name": "b-proxy-cli",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "一个bs承载页资源请求转发工具,支持http 与https",
   "main": "index.js",
   "dependencies": {
@@ -17,6 +17,10 @@
   "keywords": [
     "proxy"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/haha586/https-mimt"
+  },
   "author": "huhai",
   "license": "ISC"
 }

@@ -29,8 +29,36 @@ npm install b-proxy-cli -g
 | localServerHostName | 本地工程运行的地址       |    string | no| http://localhost:3000
 | excludePattern | 指定不需要进行代理的path 特征        |   string or regexp string | no | []
 | includePattern | 指定需要进行代理的path 特征        |   string or regexp string | no | []
-| customProxyRules(未完成) | 用户自定义的代理规则  |   rule[] | no | 无
+| customProxyRules | 用户自定义的代理规则  |   rule[] | no | 无
 | config | 配置文件的js地址  |   js | no | 无
+###api 介绍
+customProxyRules
+
+一个customProxyRules的例子
+```angular2
+interferce rule = {
+  pathRewriteRule: string,
+  byPath: string
+}
+```
+```angular2
+  customProxyRules: [
+    {
+      pathRewriteRule: "/vendors/ huhai",
+      byPass: 'http://localhost:3000'
+    }
+  ]
+```
+pathRewriteRule 支持类nginx 的path rewrite规则
+
+bypass 当前path若复合pathRewriteRule，hostName 要变为 byPass
+
+pathRewriteRule 书写规则
+
+pathRewriteRule使用单空格区分需要匹配的字符串 与 字符串被替换后的字符，可以使用js 正则表达式的所有特征
+
+bypass规则：请务必完整输入http协议/https协议 + hostname
+
 
 ### 运行方法
 
@@ -85,7 +113,15 @@ npm install b-proxy-cli -g
 * 完全交集的匹配规则伪代码： length(A 交集 B) === Math.max(length(A), length(B))；
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
+###changelist
+1.0.19
 
+支持用户自定义path重写规则，支持js 正则表达式所有语法
+
+###作者
+使用本软件若有需求或者帮助，请mail
+
+huhai#gmail.com
 
   
 

@@ -1,13 +1,15 @@
 const path = require('path');
 const forge = require('node-forge');
 const pki = forge.pki;
-const tls = require('tls');
-const url = require('url');
-const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const {requestWebpackDevServer} = require("./requestWebpackDevServer");
-const {isUrlNeedRequestLocal, requestRealTarget, createOptionsForLocalRequest} = require('./utils');
+const {
+  isUrlPathNeedRequestLocal,
+  requestRealTarget,
+  createOptionsForLocalRequest,
+  createOptionsFromCustomRule
+} = require('./utils');
 const caCertPath = path.join(__dirname, './rootCA/rootCA.crt');
 const caKeyPath = path.join(__dirname, './rootCA/rootCA.key.pem');
 
@@ -34,7 +36,7 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @param  {[type]} successFun [description]
  * @return {[type]}            [description]
  */
-function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern) {
+function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern, customProxyRules) {
   
   const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
@@ -50,20 +52,25 @@ function createFakeHttpsWebSite(domain, successFun, excludePattern, includePatte
   fakeServer.on('request', (req, res) => {
     //stnew03 中的资源并不是所有都需要转发
     
-    const urlNeedRequestLocal = isUrlNeedRequestLocal(req.url, excludePattern, includePattern);
+    let httpsOptions =  {
+      protocol: 'https:',
+      hostname: req.headers.host.split(':')[0],
+      method: req.method,
+      port: req.headers.host.split(':')[1] || 443,
+      path: req.url,
+      headers: req.headers,
+    };
+  
+    httpsOptions = createOptionsFromCustomRule(customProxyRules, httpsOptions,req.url);
+    req.url = httpsOptions.path;
+    const urlNeedRequestLocal = isUrlPathNeedRequestLocal(httpsOptions.path, excludePattern, includePattern);
+    
     if (urlNeedRequestLocal) {
       requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
     } else {
-      // 直接请求
-      let httpsOptions =  {
-        protocol: 'https:',
-        hostname: req.headers.host.split(':')[0],
-        method: req.method,
-        port: req.headers.host.split(':')[1] || 443,
-        path: req.url,
-        headers: req.headers,
-      };
-      requestRealTarget(httpsOptions, req, res, false)
+      const isHttp = httpsOptions.protocol === 'http:';
+      httpsOptions.headers.host = httpsOptions.hostname;
+      requestRealTarget(httpsOptions, req, res, isHttp)
     }
   });
   fakeServer.on('error', (e) => {

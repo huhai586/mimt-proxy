@@ -37,7 +37,7 @@ httpMitmProxy.on('request', (req, res) => {
 // https的请求通过http隧道方式转发
 httpMitmProxy.on('connect', (req, cltSocket, head) => {
   console.log('https请求传入...')
-  ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern);
+  ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules);
   cltSocket.on('error', () => {
     console.log('响应异常中断')
   })

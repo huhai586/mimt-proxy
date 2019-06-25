@@ -1,10 +1,16 @@
 const {requestWebpackDevServer} = require("./requestWebpackDevServer");
-const {requestRealTarget, isUrlNeedRequestLocal} = require('./utils');
+const {
+  requestRealTarget,
+  isUrlPathNeedRequestLocal,
+  createOptionsFromCustomRule,
+  getUrlFromOptions
+} = require('./utils');
 const url = require('url');
 const {createOptionsForLocalRequest} = require("./utils");
 
 
 const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, customProxyRules) => {
+  
   // 解析客户端请求
   var urlObject = url.parse(req.url);
   let options =  {
@@ -19,36 +25,21 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, cu
   // 为了方便起见，直接去掉客户端请求所支持的压缩方式
   delete options.headers['accept-encoding'];
   
-  console.log(`http请求方式：${options.method}，请求地址：${options.protocol}//${options.hostname}:${options.port}${options.path}`);
+  console.log(`http请求方式：${options.method}，请求地址：${req.url}`);
   
   // 请求webpack-dev-server 服务文件list;
   // 如果请求域名 + 域名的path 未在exclude名单内，那么就requestLocal
-  let urlObj = url.parse(req.url);
-  let pathAfterRewrite;
-  const hasCustomRule = customProxyRules.some((ruleObj) => {
-    const {pathRewriteRule} = ruleObj;
-    const rulesDetail = pathRewriteRule.split(" ");
-    const matchRule = rulesDetail[0];
-    const replacedRule = rulesDetail[1];
-
-    const ruleInReg = new RegExp(matchRule, 'g');
-    if (ruleInReg.test(urlObj.path)) {
-      pathAfterRewrite = urlObj.path.replace(ruleInReg, replacedRule);
-      return true;
-    }
-  });
-
-  if (hasCustomRule) {
-    options.path = pathAfterRewrite;
-  }
-
-
-  const urlNeedRequestLocal = isUrlNeedRequestLocal(options.path, excludePattern, includePattern);
+  options = createOptionsFromCustomRule(customProxyRules, options,req.url);
+  const requestUrlAfterRewrite = getUrlFromOptions(options);
+  req.url = requestUrlAfterRewrite;
+  
+  const urlNeedRequestLocal = isUrlPathNeedRequestLocal(options.path, excludePattern, includePattern);
   if (options.hostname === proxyedHostname && urlNeedRequestLocal) {
-    // console.log(`本地请求地址：${optionsForLocalRequest.method}，请求地址：${optionsForLocalRequest.protocol}//${optionsForLocalRequest.hostname}:${optionsForLocalRequest.port}${optionsForLocalRequest.path}`);
     requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
   } else {
-    requestRealTarget(options, req, res)
+    const isHttp = options.protocol === 'http:';
+    options.headers.host = options.hostname;
+    requestRealTarget(options, req, res, isHttp)
   }
 }
 

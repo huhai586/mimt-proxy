@@ -147,7 +147,7 @@ const isMatchInclude = (urlPath, includeArray) => {
     })
 }
 
-const isUrlNeedRequestLocal = (urlPath, excludeArray, includeArray) => {
+const isUrlPathNeedRequestLocal = (urlPath, excludeArray, includeArray) => {
   const matchInclude =  isMatchInclude(urlPath, includeArray)
   const matchExclude = !excludeArray.some((rule) => {
     //判断rule是否match url
@@ -246,11 +246,61 @@ const createOptionFromCli = (program) => {
   return options;
 }
 
+
+/**
+ * 解析customeRule
+ * **/
+
+const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl) => {
+  let urlObj = url.parse(originUrl);
+  const options = {...originOptions};
+  customProxyRules.some((ruleObj) => {
+    const {pathRewriteRule, byPass} = ruleObj;
+    const rulesDetail = pathRewriteRule.split(" ");
+    const matchRule = rulesDetail[0];
+    const replacedRule = rulesDetail[1];
+    
+    
+    const extractRule = matchRule.match(/^\/(.*)\/(.*)$/);
+    let regRule = matchRule,regRuleType = 'g';
+    if(extractRule) {
+      //使用了js正则表达式
+      regRule = extractRule[1];
+      regRuleType = extractRule[2] || 'g'
+    }
+    
+    const ruleInReg = new RegExp(regRule, regRuleType);
+    
+    
+    if (ruleInReg.test(urlObj.path)) {
+      const pathAfterRewrite = urlObj.path.replace(ruleInReg, replacedRule);
+      options.path = pathAfterRewrite;
+      if(byPass) {
+        // by pass
+        const byPassObj = url.parse(byPass);
+        const {protocol,port,hostname} = byPassObj;
+        options.protocol = protocol;
+        options.port = port ? port : (protocol === 'http:' ? 80 : 443);
+        // options.path = options.path;
+        options.hostname = hostname;
+      }
+      return true;
+    }
+  });
+  return options;
+}
+
+const getUrlFromOptions = (options) => {
+  return options.protocol + options.hostname + options.port + options.path;
+}
+
 exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;
 exports.matchResource = matchResource;
-exports.isUrlNeedRequestLocal = isUrlNeedRequestLocal;
+exports.isUrlPathNeedRequestLocal = isUrlPathNeedRequestLocal;
 exports.requestRealTarget = requestRealTarget;
 exports.createOptionsForLocalRequest = createOptionsForLocalRequest;
 exports.createOptionFromCli = createOptionFromCli;
+exports.createOptionsFromCustomRule = createOptionsFromCustomRule;
+exports.getUrlFromOptions = getUrlFromOptions;

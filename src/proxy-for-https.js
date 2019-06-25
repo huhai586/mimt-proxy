@@ -3,7 +3,7 @@ const net = require('net');
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 
 
-const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, includePattern) => {
+const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules) => {
   // connect to an origin server
   
   // 仅对stenew03.beisen.com来的请求进行修改，其余一律转发
@@ -28,7 +28,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
       srvSocket.on('error', (e) => {
         console.error(e);
       });
-    }, excludePattern, includePattern)
+    }, excludePattern, includePattern, customProxyRules)
     
   } else {
     // 对非stnew03.beisen.com的内容直接转发
