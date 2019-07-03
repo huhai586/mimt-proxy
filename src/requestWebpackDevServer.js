@@ -28,7 +28,7 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
     
     // 如果a能在b中找到全部匹配，那么a就是我们要找的本地资源
     // demoA = ['common', 'chunk'] demoB = ['common', 'chunk', 'min'] ,demoB中有demoA 的所有字段，可以通过判断交集数量的多少，来判断2个数组是否match
-    const matchResourceResult = matchResource(fileNameInPiecesArray, allLinkHash);
+    const matchResourceResult = matchResource(fileNameInPiecesArray, allLinkHash, req.url);
     
     const byPassRequestOptions = {
       ...optionsForLocalRequest,

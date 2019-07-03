@@ -9,7 +9,7 @@ const ProxyForHttps = require("./proxy-for-https");
 const program = require('commander');
 
 program
-  .version('1.0.0', '-v, --version')
+  .version('1.0.21', '-v, --version')
   .option('-p, --port [value]', '代理服务器运行的端口，默认6789', 6789)
   .option('--proxyedHostname [value]', '只对只对指定hostname的资源进行本地请求,默认stnew03.beisen.com', "stnew03.beisen.com")
   .option('--localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')

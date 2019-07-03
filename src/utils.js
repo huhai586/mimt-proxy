@@ -4,7 +4,7 @@ const url = require('url');
 const https = require('https');
 
 
-const extractAsset = (str) => {
+const extractAsset = (str = '') => {
   if (str === undefined) {
     debugger
   }
@@ -17,8 +17,8 @@ const extractAsset = (str) => {
     const key = v.replace(/<a href="(.*)">(.*)<\/a>/, (a,match1, match2) => {
       return match2
     });
-    
-    linkHash[key] = value;
+    linkHash[key] = linkHash[key]  || [];
+    linkHash[key].push(value);
   });
   return linkHash;
 }
@@ -54,7 +54,7 @@ const calcPosPercentage = (arr1, arr2) => {
   });
   return count/arr1.length
 }
-const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
+const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
   // 找寻arr中的文件类型与fileNameInPieces文件类型一样的
   // const match
   const getFilematchTypeArr = matchFileType(arr, fileNameInPieces[fileNameInPieces.length -1])
@@ -71,7 +71,7 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
   const maxValueCount = prosibility.filter((v) => v === theMaxProbabilityValue );
   if (maxValueCount.length === 1) {
     const maxValueIndex = prosibility.indexOf(theMaxProbabilityValue);
-    return linkHash[arr[maxValueIndex]]
+    return getUrlFromAccurateMatch(linkHash[arr[maxValueIndex]], originUrl)
   } else {
     // 对比文件长度
     const mostMatchIndex =  [];
@@ -88,19 +88,18 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash) => {
     });
     
     if (result.length === 1) {
-      console.log('非精确匹配了,',fileNameInPieces.join('.'))
-      return linkHash[result[0]]
+      console.log('非精确匹配了,',fileNameInPieces.join('.'));
+      return getUrlFromAccurateMatch(linkHash[result[0]], originUrl);
     } else if (result.length > 1){
       console.log('多个匹配出现，无法区分')
     } else if (result.length < 1) {
       console.log('找不到匹配')
     }
-    
   }
   
 }
 
-const matchResource = (fileNameInPieces = '', linkHash) => {
+const matchResource = (fileNameInPieces = '', linkHash, originUrl) => {
   if (fileNameInPieces === '') {
     console.log('异常，需要匹配的文件名为空');
     return ''
@@ -125,19 +124,41 @@ const matchResource = (fileNameInPieces = '', linkHash) => {
     return mixedArray.length === Math.max(fileNameInPiecesAfterRemoveRepeat.length , fileNameLocalPieceAfterRemoveRepeat.length);
   });
   
-  if (matchArr.length !== 0) {
-    if (matchArr.length === 1) {
-      return linkHash[matchArr[0]]
-    } else {
-      // 匹配到多个文件
-      const gotFile = matchFileFromArray(matchArr, fileNameInPieces, linkHash);
-      return gotFile;
-    }
-  } else {
+  return getUrlFromBlurryMatchArr(matchArr, fileNameInPieces, linkHash, originUrl);
+}
+
+
+const getUrlFromBlurryMatchArr = (blurryMatchArr, fileNameInPieces, linkHash, originUrl) => {
+  // 如果match arr
+  if (blurryMatchArr.length === 0) return '';
+  if (blurryMatchArr.length === 1) return getUrlFromAccurateMatch(linkHash[blurryMatchArr[0]], originUrl);
+  if (blurryMatchArr.length > 1) return matchFileFromArray(blurryMatchArr, fileNameInPieces, linkHash, originUrl);
+}
+
+const getUrlFromAccurateMatch = (urlArr = [], originUrl) => {
+  // 匹配到0个
+  if (urlArr.length === 0) {
+    console.log('error: 资源没有url地址');
+    return '';
+  }
+  // 匹配到1个
+  if (urlArr.length === 1) return urlArr[0];
+  // 匹配到多个同名文件
+  if (urlArr.length > 1) {
+    // 处理规则，移除文件名后，看文件路径是否完全匹配
+    const requestUrl = removeFileNameAndType(originUrl);
+    const findUrl = urlArr.find((url) => {
+      return requestUrl.indexOf(removeFileNameAndType(url)) !== -1
+    });
+    if (findUrl) return findUrl;
     return '';
   }
 }
 
+const removeFileNameAndType = (str = '') => {
+  const replaceResult = str.replace(/(.*)\/(.*)/, '$1')
+  return replaceResult;
+};
 const isMatchInclude = (urlPath, includeArray) => {
     if (includeArray === undefined || includeArray.length === 0) return true;
     return includeArray.every((rule) => {
@@ -236,9 +257,9 @@ const createOptionFromCli = (program) => {
   }
   
   let options = {
-    localServerHostName: program.localServerHostName || configValue.localServerHostName,
-    port: program.port || configValue.port,
-    proxyedHostname: program.proxyedHostname || configValue.proxyedHostname,
+    localServerHostName:  configValue.localServerHostName || program.localServerHostName,
+    port: configValue.port || program.port,
+    proxyedHostname:  configValue.proxyedHostname || program.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
     includePattern: configValue.includePattern,
     customProxyRules: configValue.customProxyRules
@@ -287,11 +308,12 @@ const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl) 
       return true;
     }
   });
+  options.headers.host = options.hostname;
   return options;
 }
 
 const getUrlFromOptions = (options) => {
-  return options.protocol + options.hostname + options.port + options.path;
+  return options.protocol + options.hostname + ":" +options.port + options.path;
 }
 
 exports.extractAsset = extractAsset;
