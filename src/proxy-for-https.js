@@ -8,7 +8,8 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
   
   // 仅对stenew03.beisen.com来的请求进行修改，其余一律转发
   let srvUrl = url.parse(`http://${req.url}`);
-  console.log(`https CONNECT ${srvUrl.hostname}:${srvUrl.port}`);
+  console.log('-----------------------------------------------------------')
+  console.log('🔐️ https请求传入', ` 🚥 https CONNECT ${srvUrl.hostname}:${srvUrl.port}`)
   if (srvUrl.port === 3000 || srvUrl.hostname === 'cloud.italent.link') {
     console.log('异常');
   }
@@ -26,7 +27,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
         cltSocket.pipe(srvSocket);
       });
       srvSocket.on('error', (e) => {
-        console.error(e);
+        console.error('🔔',e);
       });
     }, excludePattern, includePattern, customProxyRules)
     
@@ -41,7 +42,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
       cltSocket.pipe(srvSocket);
     });
     srvSocket.on('error', (e) => {
-      console.error(e);
+      console.error('🔔',e);
     });
   }
 

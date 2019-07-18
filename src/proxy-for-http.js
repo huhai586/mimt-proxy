@@ -25,7 +25,7 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, cu
   // 为了方便起见，直接去掉客户端请求所支持的压缩方式
   delete options.headers['accept-encoding'];
   
-  console.log(`[http]：${options.method}，请求地址：${req.url}`);
+  console.log(`🚥['http']：${options.method}，请求地址：${req.url}`);
   
   // 请求webpack-dev-server 服务文件list;
   // 如果请求域名 + 域名的path 未在exclude名单内，那么就requestLocal

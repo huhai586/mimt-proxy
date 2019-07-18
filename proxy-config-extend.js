@@ -8,19 +8,15 @@
  *
  * **/
 module.exports={
-  excludePattern: [
-    'iTalentSDKServer-0.1.9-107',
-    'favicon.ico',
-    'react-16.8.6-5.productio'
-  ],
-  includePattern: ['beisen-chat-robot'],
+  excludePattern: [],
+  includePattern: ['p-userframework-ui'],
   localServerHostName: 'http://localhost:3000',
   port: 6789,
-  proxyedHostname: 'stnew03.beisen.com',
+  proxyedHostname: 'stnew02.beisen.com',
   customProxyRules: [
     {
       pathRewriteRule: "main-2.0.8.min main.chunk",
-      byPass: 'http://10.99.28.143:3001'
+      // byPass: 'http://10.99.28.143:3001'
     }
   ]
 }

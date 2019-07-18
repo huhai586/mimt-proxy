@@ -164,7 +164,7 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
   var certPem = pki.certificateToPem(cert);
   var keyPem = pki.privateKeyToPem(keys.privateKey);
   const m2 = new Date().getTime()
-  console.log('生成证书花费时间',Math.floor((m2-m1)/1000))
+  console.log('🤠生成证书花费时间',Math.floor((m2-m1)/1000),'ms')
   global[domain] = {
     key: keyPem,
     cert: certPem

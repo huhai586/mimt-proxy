@@ -138,7 +138,7 @@ const getUrlFromBlurryMatchArr = (blurryMatchArr, fileNameInPieces, linkHash, or
 const getUrlFromAccurateMatch = (urlArr = [], originUrl) => {
   // 匹配到0个
   if (urlArr.length === 0) {
-    console.log('error: 资源没有url地址');
+    console.log('😢error: 资源没有url地址');
     return '';
   }
   // 匹配到1个

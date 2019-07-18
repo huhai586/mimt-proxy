@@ -1,26 +1,60 @@
 #### b-proxy-cli 
 http/https中间人代理工具
 
-    无需对承载页每个资源请求进行配置, 就能对里面的资源请求进行转发
+    😀无需转发rule, 自动匹配请求资源 与 本地文件
+
+#### 软件实现的功能
+
+* http/https 中间人    
+* 自动处理线上与本地文件映射
+* 手动rewrite请求url
 
 ### 使用本软件的前提
+
 * 代理https服务，需要安装根证书
-* 本地服务器目前仅支持webpack-dev-server启动，不支持其他服务器；
-* 承载页面与本地开发页面，请求的资源文件名大体相似，不能承载页面请求 common.chunk.js 本地却请求main.chunk.js
+* 本地服务器目前仅支持webpack-dev-server启动
+* 使用自动匹配情况下--请求资源与匹配资源，文件名需要大体相似，不能请求 common.chunk.js 本地却请求main.chunk.js。
 
 
 
 ###安装
 
-如果要代理https网站，请务必安装根证书，根证书的位置放在模块下面的src/rootCA.crt
-请安装，并选择"完全信任"；
-
 ```angular2
 npm install b-proxy-cli -g
 
 ```
-    
-###api
+
+如果要代理https网站，请务必安装根证书，根证书的位置放在模块下面的src/rootCA.crt
+请安装，并选择"完全信任"；
+
+###使用
+
+```angular2
+b-proxy-cli --config ./proxy-config-extend.js
+```
+配置文件demo
+```angular2
+module.exports={
+  excludePattern: [],
+  includePattern: ['p-userframework-ui'],
+  localServerHostName: 'http://localhost:3000',
+  port: 6789,
+  proxyedHostname: 'stnew02.beisen.com',
+  customProxyRules: [
+    {
+      pathRewriteRule: "main-2.0.8.min main.chunk",
+      byPass: 'http://10.99.28.143:3001'
+    }
+  ]
+}
+```
+上面的配置文件demo代表的大概意思为：
+代理运行的端口为6789，只对stnew02.beisen.com 域名下的资源进行代理，代理的时候会检查path是否有'p-userframework-ui字段
+如果有的话，作为中间人代理该资源，如果没有的话，作为透明代理。
+
+
+
+###配置api
 
 | 属性  |说明  | 类型| 必须配置 | 默认值| 
 | ------------ |-------|--------| -----|-----|
@@ -49,15 +83,32 @@ interferce rule = {
     }
   ]
 ```
-pathRewriteRule 支持类nginx 的path rewrite规则
 
-bypass 当前path若复合pathRewriteRule，hostName 要变为 byPass
+假如您请求的是 http://stnew03.beisen.com/chat-robot/release/dist/vendors.js
+经过上面的代理规则，请求的url会变成
+http://localhost:3000/chat-robot/release/dist/huhai.js
+
+当然你也可以更改整个路径，比如
+```angular2
+  customProxyRules: [
+    {
+      pathRewriteRule: "/^(.*)$/ common.js",
+      byPass: 'http://www.baidu.com'
+    }
+  ]
+```
+这时候的请求url地址就会变成 http://www.baidu.com/common.js
+
+~~~
+pathRewriteRule 支持类nginx 的path rewrite规则
 
 pathRewriteRule 书写规则
 
 pathRewriteRule使用单空格区分需要匹配的字符串 与 字符串被替换后的字符，可以使用js 正则表达式的所有特征
 
 bypass规则：请务必完整输入http协议/https协议 + hostname
+~~~
+
 
 
 ### 运行方法
@@ -75,10 +126,6 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 
 如果你不想所有请求都走本代理，可以使用类似SwitchyOmega的工具转发特定域名的请求到本代理
    
-###实现功能
-* http/https 中间人    
-* 无需对每个资源请求进行正则配置, 就能对里面所有资源请求进行转发
-
 
 ### 无需配置参数就能匹配到本地文件的原理
 
@@ -114,6 +161,9 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.0.24
+支持emoji表情在commandline中显示，更友好的提示方式
+
 1.0.19
 
 支持用户自定义path重写规则，支持js 正则表达式所有语法

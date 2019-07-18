@@ -29,17 +29,16 @@ let httpMitmProxy = new http.Server();
 httpMitmProxy.on('request', (req, res) => {
   ProxyForHttp(req,res,proxyedHostname, excludePattern, includePattern,customProxyRules);
   res.on('error', () => {
-    console.log('响应异常中断')
+    console.log('😩响应异常中断')
   })
 });
 
 // 代理https请求
 // https的请求通过http隧道方式转发
 httpMitmProxy.on('connect', (req, cltSocket, head) => {
-  console.log('https请求传入...')
   ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules);
   cltSocket.on('error', () => {
-    console.log('响应异常中断')
+    console.log('😩响应异常中断')
   })
 });
 
@@ -49,12 +48,12 @@ httpMitmProxy.on('connect', (req, cltSocket, head) => {
 
 
 httpMitmProxy.listen(port, function () {
-  console.log(`HTTP/HTTPS中间人代理启动成功，端口：${port}`);
+  console.log(`💚HTTP/HTTPS中间人代理启动成功，端口：${port}`);
 });
 
 httpMitmProxy.on('error', (e) => {
   if (e.code == 'EADDRINUSE') {
-    console.error('HTTP/HTTPS中间人代理启动失败！！');
+    console.error('😰HTTP/HTTPS中间人代理启动失败！！');
     console.error(`端口：${port}，已被占用。`);
   } else {
     console.error(e);
