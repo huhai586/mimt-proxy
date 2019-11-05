@@ -1,7 +1,7 @@
 const {requestWebpackDevServer} = require("./requestWebpackDevServer");
 const {
   requestRealTarget,
-  isUrlPathNeedRequestLocal,
+  isUrlNeedRequestLocal,
   createOptionsFromCustomRule,
   getUrlFromOptions
 } = require('./utils');
@@ -29,12 +29,20 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, cu
   
   // 请求webpack-dev-server 服务文件list;
   // 如果请求域名 + 域名的path 未在exclude名单内，那么就requestLocal
-  options = createOptionsFromCustomRule(customProxyRules, options,req.url);
+  
+  options = createOptionsFromCustomRule(customProxyRules, options,req.url, proxyedHostname, excludePattern, includePattern);
+  
   const requestUrlAfterRewrite = getUrlFromOptions(options);
   req.url = requestUrlAfterRewrite;
   
-  const urlNeedRequestLocal = isUrlPathNeedRequestLocal(options.path, excludePattern, includePattern);
-  if (options.hostname === proxyedHostname && urlNeedRequestLocal) {
+  const urlNeedRequestLocal = isUrlNeedRequestLocal(
+    proxyedHostname,
+    options.hostname,
+    options.path,
+    excludePattern,
+    includePattern
+  );
+  if (urlNeedRequestLocal) {
     requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
   } else {
     const isHttp = options.protocol === 'http:';

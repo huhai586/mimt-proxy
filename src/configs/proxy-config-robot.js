@@ -8,14 +8,19 @@
  *
  * **/
 module.exports={
-  excludePattern: ['webpack-bootstrap', 'vendors'],
-  includePattern: ['ux-cloud-thunder-page'],
-  localServerHostName: 'http://localhost:3001',
+  description:'机器人开发配置文件',
+  excludePattern: [
+    'iTalentSDKServer-0.1.9-107',
+    'favicon.ico',
+    'react-16.8.6-5.productio'
+  ],
+  includePattern: ['beisen-chat-robot'],
+  localServerHostName: 'http://localhost:3000',
   port: 6789,
-  proxyedHostname: 'stnew.beisen.com',
+  proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "main-fd49f5a65a4811d5c18d.chunk.min.js main.js",
+      pathRewriteRule: "main-2.0.8.min main.chunk",
       // byPass: 'http://10.99.28.143:3001'
     }
   ]

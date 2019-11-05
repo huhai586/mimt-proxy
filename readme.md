@@ -161,6 +161,16 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.1.2
+feature: 升级rootca的加密级别到rsa2048，防止浏览器提示证书弱密码
+1.1.1
+feature: 增加系统级别的错误提示notifer
+
+1.1.0
+
+重大更新： 解决bugs
+bugsfix：customProxyRules 会修改所有代理的url
+
 1.0.24
 支持emoji表情在commandline中显示，更友好的提示方式
 

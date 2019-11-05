@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-const http = require('http');
-const {createOptionsForLocalRequest, createOptionFromCli} = require('./utils');
-const ProxyForHttp = require("./proxy-for-http");
-const ProxyForHttps = require("./proxy-for-https");
-
+const {initProxyServer} = require("./initialProxyServer")
 // 初始化过程
 // 获取运行端口 + 获取代理服务器http地址
 const program = require('commander');
@@ -18,45 +14,13 @@ program
   .option('--excludePattern [value]', 'url path不能包含的字符串或者正则，如果包含了，则不走代理')
   .parse(process.argv);
 
-let {localServerHostName, port, proxyedHostname, excludePattern, customProxyRules, includePattern} = createOptionFromCli(program);
 
-//初始化localRequest options
-createOptionsForLocalRequest.init(localServerHostName);
-
-let httpMitmProxy = new http.Server();
-
-// 代理http请求
-httpMitmProxy.on('request', (req, res) => {
-  ProxyForHttp(req,res,proxyedHostname, excludePattern, includePattern,customProxyRules);
-  res.on('error', () => {
-    console.log('😩响应异常中断')
-  })
-});
-
-// 代理https请求
-// https的请求通过http隧道方式转发
-httpMitmProxy.on('connect', (req, cltSocket, head) => {
-  ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules);
-  cltSocket.on('error', () => {
-    console.log('😩响应异常中断')
-  })
-});
+if(program.config === undefined) {
+  //如果没有相应的配置文件，那么运行友好页面提示用户选择配置
+  
+} else {
+  initProxyServer(program)
+}
 
 
-
-
-
-
-httpMitmProxy.listen(port, function () {
-  console.log(`💚HTTP/HTTPS中间人代理启动成功，端口：${port}`);
-});
-
-httpMitmProxy.on('error', (e) => {
-  if (e.code == 'EADDRINUSE') {
-    console.error('😰HTTP/HTTPS中间人代理启动失败！！');
-    console.error(`端口：${port}，已被占用。`);
-  } else {
-    console.error(e);
-  }
-});
 

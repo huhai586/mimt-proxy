@@ -1,6 +1,6 @@
 const http = require('http');
 const {extractAsset, getFileName, splitFileNameInPieces, matchResource} = require('./utils');
-const {requestRealTarget} = require("./utils");
+const {requestRealTarget, showMessage} = require("./utils");
 const getBody = (response) => {
   response.setEncoding('utf8');
   return new Promise((resolve, reject) => {
@@ -48,6 +48,10 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
   reWDV.end();
   reWDV.on('error', (e) => {
     console.error(e);
+    if (e.code === 'ECONNREFUSED') {
+      e.subtitle = "本地webpack server 没有启动？";
+    }
+    showMessage.error(e);
   })
 };
 

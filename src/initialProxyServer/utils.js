@@ -2,6 +2,7 @@ const path = require('path');
 const http = require('http');
 const url = require('url');
 const https = require('https');
+const notifier = require('node-notifier');
 
 
 const extractAsset = (str = '') => {
@@ -168,14 +169,18 @@ const isMatchInclude = (urlPath, includeArray) => {
     })
 }
 
-const isUrlPathNeedRequestLocal = (urlPath, excludeArray, includeArray) => {
-  const matchInclude =  isMatchInclude(urlPath, includeArray)
+const isPathMatchRule = (urlPath,excludeArray, includeArray) => {
+  const matchInclude =  isMatchInclude(urlPath, includeArray);
   const matchExclude = !excludeArray.some((rule) => {
     //判断rule是否match url
     const ruleInreg = new RegExp(rule);
     return ruleInreg.test(urlPath);
   })
   return matchExclude && matchInclude
+}
+const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArray, includeArray) => {
+  if (proxyedHostname !== urlHostName) return false;
+  return isPathMatchRule(urlPath,excludeArray, includeArray)
 }
 
 
@@ -272,7 +277,14 @@ const createOptionFromCli = (program) => {
  * 解析customeRule
  * **/
 
-const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl) => {
+const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl, proxyedHostname, excludePattern, includePattern) => {
+  
+  //
+  
+  // 只有originUrl 的 hostname 与 originOptions.hostName 相等才进行下一步
+  if (originOptions.hostname !== proxyedHostname) return originOptions;
+  if (isPathMatchRule(originOptions.path, excludePattern, includePattern) === false) return originOptions;
+  
   let urlObj = url.parse(originUrl);
   const options = {...originOptions};
   customProxyRules.some((ruleObj) => {
@@ -286,8 +298,8 @@ const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl) 
     let regRule = matchRule,regRuleType = 'g';
     if(extractRule) {
       //使用了js正则表达式
-      regRule = extractRule[1];
-      regRuleType = extractRule[2] || 'g'
+      regRule = extractRule[0];
+      regRuleType = 'g'
     }
     
     const ruleInReg = new RegExp(regRule, regRuleType);
@@ -316,13 +328,30 @@ const getUrlFromOptions = (options) => {
   return options.protocol + options.hostname + ":" +options.port + options.path;
 }
 
+
+const showMessage = {
+  error: (e) => {
+    notifier.notify(
+      {
+        title: '请求出错了!',
+        subtitle: e.subtitle,
+        message: e.message,
+        icon: path.join(__dirname, '/images/horrible.png'), // Absolute path (doesn't work on balloons)
+        sound: true, // Only Notification Center or Windows Toasters
+        wait: false // Wait with callback, until user action is taken against notification,
+      }
+    );
+  }
+}
+
 exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;
 exports.matchResource = matchResource;
-exports.isUrlPathNeedRequestLocal = isUrlPathNeedRequestLocal;
+exports.isUrlNeedRequestLocal = isUrlNeedRequestLocal;
 exports.requestRealTarget = requestRealTarget;
 exports.createOptionsForLocalRequest = createOptionsForLocalRequest;
 exports.createOptionFromCli = createOptionFromCli;
 exports.createOptionsFromCustomRule = createOptionsFromCustomRule;
 exports.getUrlFromOptions = getUrlFromOptions;
+exports.showMessage = showMessage;

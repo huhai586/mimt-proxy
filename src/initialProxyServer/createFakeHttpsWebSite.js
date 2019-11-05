@@ -5,13 +5,13 @@ const https = require('https');
 const fs = require('fs');
 const {requestWebpackDevServer} = require("./requestWebpackDevServer");
 const {
-  isUrlPathNeedRequestLocal,
+  isUrlNeedRequestLocal,
   requestRealTarget,
   createOptionsForLocalRequest,
   createOptionsFromCustomRule
 } = require('./utils');
-const caCertPath = path.join(__dirname, './rootCA/rootCA.crt');
-const caKeyPath = path.join(__dirname, './rootCA/rootCA.key.pem');
+const caCertPath = path.join(__dirname, '../rootCA/rootCA.crt');
+const caKeyPath = path.join(__dirname, '../rootCA/rootCA.key.pem');
 
 try {
   fs.accessSync(caCertPath, fs.F_OK);
@@ -36,7 +36,7 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @param  {[type]} successFun [description]
  * @return {[type]}            [description]
  */
-function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern, customProxyRules) {
+function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern, customProxyRules, proxyedHostname) {
   
   const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
@@ -61,9 +61,15 @@ function createFakeHttpsWebSite(domain, successFun, excludePattern, includePatte
       headers: req.headers,
     };
   
-    httpsOptions = createOptionsFromCustomRule(customProxyRules, httpsOptions,req.url);
+    httpsOptions = createOptionsFromCustomRule(customProxyRules, httpsOptions,req.url, proxyedHostname, excludePattern, includePattern);
     req.url = httpsOptions.path;
-    const urlNeedRequestLocal = isUrlPathNeedRequestLocal(httpsOptions.path, excludePattern, includePattern);
+    const urlNeedRequestLocal = isUrlNeedRequestLocal(
+      proxyedHostname,
+      httpsOptions.hostname,
+      httpsOptions.path,
+      excludePattern,
+      includePattern
+    );
     
     if (urlNeedRequestLocal) {
       requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
@@ -88,7 +94,7 @@ function createFakeHttpsWebSite(domain, successFun, excludePattern, includePatte
  */
 function createFakeCertificateByDomain(caKey, caCert, domain) {
   const m1 = new Date().getTime()
-  var keys = pki.rsa.generateKeyPair(2046);
+  var keys = pki.rsa.generateKeyPair(2048);
   var cert = pki.createCertificate();
   cert.publicKey = keys.publicKey;
   
@@ -159,7 +165,8 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
     {
       name:'authorityKeyIdentifier'
     }]);
-  cert.sign(caKey, forge.md.sha256.create());
+  
+  cert.sign(caKey, forge.sha512.create());
   
   var certPem = pki.certificateToPem(cert);
   var keyPem = pki.privateKeyToPem(keys.privateKey);
