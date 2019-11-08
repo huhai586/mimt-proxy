@@ -8,15 +8,15 @@
  *
  * **/
 module.exports={
-  description:'测试端口号',
-  excludePattern: ['webpack-bootstrap', 'vendors','common'],
-  includePattern: ['beisen-chat-robot'],
-  localServerHostName: 'http://localhost:9001',
-  port: 8788,
+  description:'流程设置-发起条件',
+  excludePattern: ['webpack-bootstrap', 'vendors'],
+  includePattern: ['p-start-condition'],
+  localServerHostName: 'http://localhost:3003',
+  port: 6789,
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "/ux/beisen-chat-robot/release/dist/main.305ac08bace5e7f283e3.bundle main.305ac08bace5e7f283e3.bundle",
+      pathRewriteRule: "/ux/beisen-chat-robot/release/dist/main\.305ac08bace5e7f283e3\.bundle main\.305ac08bace5e7f283e3.bundle",
       byPass: 'http://10.99.28.83:9001'
     }
   ]

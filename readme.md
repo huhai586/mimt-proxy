@@ -161,9 +161,33 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.3.4
+
+bugfix: 防御用户规则转换失败造成程序crash
+
+1.3.3
+
+bugfix: ws 不能广播给所有客户端
+
+1.3.2
+
+pac文件地址提供
+
+1.3.1
+
+提供http代理服务pac.js 文件，方便设备配置代理服务器
+
+1.3.0
+  breakthrough change
+
+支持图形化选择用户配置文件
+
 1.1.2
+
 feature: 升级rootca的加密级别到rsa2048，防止浏览器提示证书弱密码
+
 1.1.1
+
 feature: 增加系统级别的错误提示notifer
 
 1.1.0
@@ -172,6 +196,7 @@ feature: 增加系统级别的错误提示notifer
 bugsfix：customProxyRules 会修改所有代理的url
 
 1.0.24
+
 支持emoji表情在commandline中显示，更友好的提示方式
 
 1.0.19

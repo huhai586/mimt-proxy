@@ -59,6 +59,6 @@ const getProxyServer = () => {
 }
 module.exports = {
   initProxyServer: init,
-  shutDownServer: shutDownServer,
+  shutDownServer,
   getProxyServer
 }

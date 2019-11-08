@@ -257,7 +257,7 @@ const createOptionFromCli = (program) => {
   const config = program.config;
   const currentDirection = process.cwd();
   if (config) {
-    const configFileAddress = path.join(currentDirection,`${config}`);
+    const configFileAddress = path.join(__dirname,`../configs/${config}`);
     configValue = require(configFileAddress);
   }
   
@@ -273,6 +273,11 @@ const createOptionFromCli = (program) => {
 }
 
 
+const deleteBlankItemInArray = (arr) => {
+  return arr.filter((v) => {
+    return v !== ''
+  })
+};
 /**
  * 解析customeRule
  * **/
@@ -286,42 +291,55 @@ const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl, 
   if (isPathMatchRule(originOptions.path, excludePattern, includePattern) === false) return originOptions;
   
   let urlObj = url.parse(originUrl);
-  const options = {...originOptions};
+  let optionsNew = {...originOptions};
+  
   customProxyRules.some((ruleObj) => {
     const {pathRewriteRule, byPass} = ruleObj;
-    const rulesDetail = pathRewriteRule.split(" ");
-    const matchRule = rulesDetail[0];
-    const replacedRule = rulesDetail[1];
+    let matchRule,replacedRule;
+    const rulesDetail = deleteBlankItemInArray(pathRewriteRule.split(" "));
     
+    if (rulesDetail.length !== 2) {
+      console.log("自定义规则中有多个非连续空格无法解析，只能存在一个或者多个连续空格，请修改规则：", ruleObj);
+      return false;
+    }
     
-    const extractRule = matchRule.match(/^\/(.*)\/(.*)$/);
+    matchRule = rulesDetail[0];
+    replacedRule = rulesDetail[1];
+    
     let regRule = matchRule,regRuleType = 'g';
+    const extractRule = matchRule.match(/^\/(.*)\/([gi]?)$/);
     if(extractRule) {
       //使用了js正则表达式
       regRule = extractRule[0];
-      regRuleType = 'g'
+      regRuleType = extractRule[1] ? extractRule[1] : 'g'
     }
     
-    const ruleInReg = new RegExp(regRule, regRuleType);
+    let ruleInReg;
+    try {
+      ruleInReg = new RegExp(regRule, regRuleType);
+    } catch(e) {
+      console.log("正则表达式转换失败,请检查:", regRule);
+      return false;
+    }
     
     
     if (ruleInReg.test(urlObj.path)) {
       const pathAfterRewrite = urlObj.path.replace(ruleInReg, replacedRule);
-      options.path = pathAfterRewrite;
+      optionsNew.path = pathAfterRewrite;
       if(byPass) {
         // by pass
         const byPassObj = url.parse(byPass);
         const {protocol,port,hostname} = byPassObj;
-        options.protocol = protocol;
-        options.port = port ? port : (protocol === 'http:' ? 80 : 443);
+        optionsNew.protocol = protocol;
+        optionsNew.port = port ? port : (protocol === 'http:' ? 80 : 443);
         // options.path = options.path;
-        options.hostname = hostname;
+        optionsNew.hostname = hostname;
       }
       return true;
     }
   });
-  options.headers.host = options.hostname;
-  return options;
+  optionsNew.headers.host = optionsNew.hostname;
+  return optionsNew;
 }
 
 const getUrlFromOptions = (options) => {

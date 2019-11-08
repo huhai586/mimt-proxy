@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-const {initProxyServer} = require("./initialProxyServer")
+const {initProxyServer} = require("./initialProxyServer");
+const wsAbout = require("./selectConfig")
 // 初始化过程
 // 获取运行端口 + 获取代理服务器http地址
 const program = require('commander');
@@ -17,6 +18,8 @@ program
 
 if(program.config === undefined) {
   //如果没有相应的配置文件，那么运行友好页面提示用户选择配置
+  //启动后台服务+启动网页
+  wsAbout.initWsAndHttpServer();
   
 } else {
   initProxyServer(program)
