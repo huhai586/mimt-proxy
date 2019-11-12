@@ -187,14 +187,18 @@ const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArra
 const requestRealTarget =  (options,req, res, isHttp = true) => {
   // 根据客户端请求，向真正的目标服务器发起请求。
   let chunkCount = 0;
+  let hasCrosSetting = false;
   let httpMethod = isHttp ? http : https;
   let realReq = httpMethod.request(options, (realRes) => {
     
     // 设置客户端响应的http头部
     Object.keys(realRes.headers).forEach(function(key) {
       res.setHeader(key, realRes.headers[key]);
+      hasCrosSetting = (key === 'access-control-allow-origin');
     });
-    
+    if(hasCrosSetting === false) {
+      res.setHeader('access-control-allow-origin', "*");
+    }
     res.setHeader('Warning', "this file is from proxy server");
     // res.setHeader('Pragma', "no-cache");
     
@@ -296,22 +300,22 @@ const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl, 
   customProxyRules.some((ruleObj) => {
     const {pathRewriteRule, byPass} = ruleObj;
     let matchRule,replacedRule;
-    const rulesDetail = deleteBlankItemInArray(pathRewriteRule.split(" "));
+    const rulesDetail = deleteBlankItemInArray(pathRewriteRule.trim().split(" "));
     
-    if (rulesDetail.length !== 2) {
-      console.log("自定义规则中有多个非连续空格无法解析，只能存在一个或者多个连续空格，请修改规则：", ruleObj);
+    if ((rulesDetail.length !== 2) && !ruleObj.pathReplaceFunc) {
+      console.log("自定义规则中有多个非连续空格无法解析，只能存在一个或者多个连续空格 或不存在空格但是提供了替换函数pathReplaceFunc，请修改规则：", ruleObj);
       return false;
     }
     
     matchRule = rulesDetail[0];
-    replacedRule = rulesDetail[1];
+    replacedRule = ruleObj.pathReplaceFunc || rulesDetail[1];
     
     let regRule = matchRule,regRuleType = 'g';
     const extractRule = matchRule.match(/^\/(.*)\/([gi]?)$/);
     if(extractRule) {
       //使用了js正则表达式
-      regRule = extractRule[0];
-      regRuleType = extractRule[1] ? extractRule[1] : 'g'
+      regRule = extractRule[1].replace("/",'\/');
+      regRuleType = extractRule[2] ? extractRule[2] : 'g'
     }
     
     let ruleInReg;

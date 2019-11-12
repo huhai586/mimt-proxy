@@ -7,17 +7,24 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
+
+// DEMO
+// https://stnew03.beisen.com/ux/setting-cloud-italent/release/app/scripts/views/application/index-page-view-1910231746.min.js
+// http://localhost:8000/scripts/views/application/index-page-view.js
 module.exports={
-  description:'流程设置-发起条件',
-  excludePattern: ['webpack-bootstrap', 'vendors'],
-  includePattern: ['p-start-condition'],
+  description:'实施态-italent',
+  excludePattern: [],
+  includePattern: ['setting-cloud-italent'],
   localServerHostName: 'http://localhost:3003',
   port: 6789,
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "/ux/beisen-chat-robot/release/dist/main\.305ac08bace5e7f283e3\.bundle main\.305ac08bace5e7f283e3.bundle",
-      byPass: 'http://10.99.28.83:9001'
+      pathRewriteRule: '/(\/ux\/setting-cloud-italent\/release\/app)/(.*)/g',
+      pathReplaceFunc: (matchStr, $1,$2,originStr) => {
+        return  '/'+ $2.replace(/-[\d]+\.min/,'');
+      },
+      byPass: 'http://localhost:8000'
     }
   ]
 }

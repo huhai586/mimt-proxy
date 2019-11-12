@@ -44,6 +44,7 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, cu
   );
   if (urlNeedRequestLocal) {
     requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
+    // 如果proxyedHostname !== options.hostname,是因为用户重新改写了请求的host,这时候就不能再请求local了
   } else {
     const isHttp = options.protocol === 'http:';
     requestRealTarget(options, req, res, isHttp)

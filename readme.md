@@ -161,6 +161,15 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.3.6
+
+feature: 为所有请求response 添加 access-control-allow-origin: * 解决跨域问题
+
+
+1.3.5
+
+feature: 用户自定义规则中支持replace 函数（用来支持复杂的用户替换规则）
+
 1.3.4
 
 bugfix: 防御用户规则转换失败造成程序crash

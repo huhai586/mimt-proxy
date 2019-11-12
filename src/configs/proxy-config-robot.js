@@ -4,7 +4,7 @@
  * @localServerHostName string 本地资源服务器hostname
  * @port number 代理服务器运行的端口
  * @proxyedHostname string 只对只对指定hostname的资源进行本地请求
- * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则(暂未支持)
+ * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
 module.exports={
