@@ -190,25 +190,46 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
   let hasCrosSetting = false;
   let httpMethod = isHttp ? http : https;
   let realReq = httpMethod.request(options, (realRes) => {
-    
-    // 设置客户端响应的http头部
-    Object.keys(realRes.headers).forEach(function(key) {
-      res.setHeader(key, realRes.headers[key]);
-      hasCrosSetting = (key === 'access-control-allow-origin');
+    realRes.setEncoding('utf8');
+  
+    let body = '';
+   
+    realRes.on('data', (chunk) => {
+      // return '111' + chunk
+      body += chunk;
     });
-    if(hasCrosSetting === false) {
-      res.setHeader('access-control-allow-origin', "*");
-    }
-    res.setHeader('Warning', "this file is from proxy server");
-    // res.setHeader('Pragma', "no-cache");
-    
-    // 设置客户端响应状态码
-    res.writeHead(realRes.statusCode);
-    realRes.on('data', () => {
-      // console.log('Receiving chunk', ++chunkCount)
+    realRes.on('end', () => {
+      let b = body;
+      //https://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
+      const length = Buffer.byteLength(b);
+      
+      res.setHeader('content-length', length);
+      // 设置客户端响应的http头部
+      Object.keys(realRes.headers).forEach(function(key) {
+        if (key === 'content-length') {
+          return
+        }
+        res.setHeader(key, realRes.headers[key]);
+        hasCrosSetting = (key === 'access-control-allow-origin');
+      });
+  
+      if(hasCrosSetting === false) {
+        // bugfix: web font 需要跨域
+        res.setHeader('access-control-allow-origin', "*");
+      };
+  
+      res.setHeader('Warning', "this file is from proxy server");
+      // res.setHeader('Pragma', "no-cache");
+  
+      // 设置客户端响应状态码
+      res.writeHead(realRes.statusCode);
+      res.end(b)
+     
+      
     })
     // 通过pipe的方式把真正的服务器响应内容转发给客户端
-    realRes.pipe(res);
+    // realRes.pipe(res);
+
   });
   
   // 通过pipe的方式把客户端请求内容转发给目标服务器
@@ -286,7 +307,7 @@ const deleteBlankItemInArray = (arr) => {
  * 解析customeRule
  * **/
 
-const createOptionsFromCustomRule = (customProxyRules,originOptions, originUrl, proxyedHostname, excludePattern, includePattern) => {
+const createOptionsFromCustomRule = (customProxyRules = [],originOptions, originUrl, proxyedHostname, excludePattern, includePattern) => {
   
   //
   
