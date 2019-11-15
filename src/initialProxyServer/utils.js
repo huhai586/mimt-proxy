@@ -251,8 +251,8 @@ const createOptionsForLocalRequest = {
   init: function(localServerHostName){
     const urlOption = url.parse(localServerHostName);
     
-    const {hostName, port, protocol} = urlOption;
-    this.hostName = hostName;
+    const {hostname, port, protocol} = urlOption;
+    this.hostname = hostname;
     this.port = port;
     this.protocol = protocol;
   },
