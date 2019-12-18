@@ -183,53 +183,91 @@ const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArra
   return isPathMatchRule(urlPath,excludeArray, includeArray)
 }
 
+// octet-stream代表二进制数据
+const ignoreType=['font', 'octet-stream'];
+const isIgnoredContentType = (fileType = '') => {
+  return ignoreType.some((typeStr) => {
+    return fileType.indexOf(typeStr) !== -1;
+  })
+}
+
+
+const setHeader = (realRes, res) => {
+  let hasCrosSetting = false;
+  //common header
+  res.setHeader('Warning', "this file is from proxy server");
+
+  
+  // 设置客户端响应的http头部
+  Object.keys(realRes.headers).forEach(function(key) {
+    if (key === 'content-length') {
+      return
+    }
+    res.setHeader(key, realRes.headers[key]);
+    hasCrosSetting = (key === 'access-control-allow-origin');
+  });
+  
+  if(hasCrosSetting === false) {
+    // bugfix: web font 需要跨域
+    res.setHeader('access-control-allow-origin', "*");
+  };
+  // 设置客户端响应状态码
+  res.writeHead(realRes.statusCode);
+}
+
 
 const requestRealTarget =  (options,req, res, isHttp = true) => {
   // 根据客户端请求，向真正的目标服务器发起请求。
   let chunkCount = 0;
-  let hasCrosSetting = false;
   let httpMethod = isHttp ? http : https;
-  let realReq = httpMethod.request(options, (realRes) => {
-    realRes.setEncoding('utf8');
   
+  // 为了方便起见，直接去掉客户端请求所支持的压缩方式
+  if(options.headers && options.headers['accept-encoding'] ) {
+    delete options.headers['accept-encoding'];
+  }
+  if(options.headers && options.headers['cache-control'] ) {
+    options.headers['cache-control'] = 'no-store';
+  }
+  
+  
+  let realReq = httpMethod.request(options, (realRes) => {
+    // 对font type的数据不设置为utf-8格式，因为utf-8 格式会导致数据size错误，暂不知道原因
+    const contentType = realRes.headers['content-type'];
+    const isIgnoredType = isIgnoredContentType(contentType);
+    if (isIgnoredType === false) realRes.setEncoding('utf8');
+    
+    if (realRes.statusCode !== 200) {
+      res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage);
+      return
+    }
+
+    if (isIgnoredType === true) {
+      setHeader(realRes, res);
+      // 通过pipe的方式把真正的服务器响应内容转发给客户端
+      realRes.pipe(res);
+      return
+    }
+    
+    
+    
     let body = '';
-   
     realRes.on('data', (chunk) => {
       // return '111' + chunk
       body += chunk;
     });
+    
     realRes.on('end', () => {
       let b = body;
       //https://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
       const length = Buffer.byteLength(b);
-      
+      res.setHeader('Pragma', "no-cache");
+      res.setHeader('cache-control', "no-store");
       res.setHeader('content-length', length);
-      // 设置客户端响应的http头部
-      Object.keys(realRes.headers).forEach(function(key) {
-        if (key === 'content-length') {
-          return
-        }
-        res.setHeader(key, realRes.headers[key]);
-        hasCrosSetting = (key === 'access-control-allow-origin');
-      });
-  
-      if(hasCrosSetting === false) {
-        // bugfix: web font 需要跨域
-        res.setHeader('access-control-allow-origin', "*");
-      };
-  
-      res.setHeader('Warning', "this file is from proxy server");
-      // res.setHeader('Pragma', "no-cache");
-  
-      // 设置客户端响应状态码
-      res.writeHead(realRes.statusCode);
+      setHeader(realRes, res);
       res.end(b)
-     
-      
     })
-    // 通过pipe的方式把真正的服务器响应内容转发给客户端
-    // realRes.pipe(res);
-
+    
+    
   });
   
   // 通过pipe的方式把客户端请求内容转发给目标服务器

@@ -161,6 +161,9 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.3.9
+bugfix： 对字体文件使用utf-8编码后导致字体size尺寸不对
+
 1.3.6
 
 feature: 为所有请求response 添加 access-control-allow-origin: * 解决跨域问题
