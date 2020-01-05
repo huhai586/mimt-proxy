@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 const actions = require("../consts");
 const {getIP} = require("../common/utils");
-const {initProxyServer, getProxyServer} = require("../initialProxyServer")
+const {initProxyServer, getProxyServer} = require("../initialProxyServer");
+const NpmApi= require('npm-api');
 const open = require('open');
 
 const express = require('express');
@@ -81,6 +83,19 @@ const wsAbout = {
     const curIP = getIP();
     return `http://${curIP}:1347/pac.js`
   },
+  openConfigFile: function(data){
+    console.log('当前的路径',__dirname)
+    // const fileLocation  = process.cwd();
+    const configFilePosition2 = path.resolve(__dirname, `../configs/${data.fileName}`);
+    console.log('当前的路径',configFilePosition2)
+  
+    exec(`open -R ${configFilePosition2}`, (err, stdout, stderr) => {
+      if(err) {
+        console.log('打开文件夹错误',err, stdout, stderr);
+        return;
+      }
+    })
+  },
   startUpCallBack: function(fileName,fileData, statusObj){
     const params = {action: actions.START_CALLBACK, payload: {...statusObj, fileName, fileData}};
     if (statusObj.startSuc) {
@@ -107,6 +122,30 @@ const wsAbout = {
   getCurrentConfig: function(){
     return this.currentConfig
   },
+  checkLocalVersion:function() {
+    const fileLocation  = process.cwd();
+    const file = fileLocation+'/package.json';
+  
+    const  result=JSON.parse(fs.readFileSync( file));
+    return result.version;
+  },
+  versionCompare: function(latestVersion,localVersion){
+    if (latestVersion !== localVersion) {
+      const params = {action: actions.CHECK_UPDATE, payload: {latestVersion,localVersion}};
+      this.sendMessage(params);
+    }
+  },
+  checkUpdate:function(){
+    const npm = new NpmApi();
+    const moduleInstance = npm.repo('b-proxy-cli');
+    // const moduleInstance = npm.view('b-proxy-cli');
+    const m = moduleInstance.package('latest')
+    m.then((v) => {
+      const latestVersion = v.version;
+      const localVersion = this.checkLocalVersion()
+      this.versionCompare(latestVersion,localVersion)
+    })
+  },
   getMatchInfoFromAction: function(msgJson) {
     switch (msgJson.action) {
       case actions.FETCH_ALL_CONFIGS:
@@ -117,6 +156,12 @@ const wsAbout = {
         return this.getCurrentConfig();
       case actions.GET_PAC_ADDRESS:
         return this.getPacAddress()
+      case actions.EDIT_CONFIG:
+         this.openConfigFile(msgJson.payload);
+         break;
+      case actions.CHECK_UPDATE:
+         this.checkUpdate(msgJson.payload);
+         break;
       default :
         console.log("未找到对应数据",msgJson.action);
     
@@ -137,6 +182,10 @@ const wsAbout = {
           return;
         }
         const info = this.getMatchInfoFromAction(msg);
+        if (info === undefined) {
+          console.log("当前msg无返回值", msg);
+          return;
+        }
         const params = {action: msg.action, payload: info};
         this.sendMessage(params);
       });
