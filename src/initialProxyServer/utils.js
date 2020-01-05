@@ -184,8 +184,10 @@ const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArra
 }
 
 // octet-stream代表二进制数据
-const ignoreType=['font', 'octet-stream'];
+const ignoreType=['font', 'octet-stream', 'image'];
 const isIgnoredContentType = (fileType = '') => {
+  // 对所有没有content-type的数据不做特殊处理（utf-8格式化。。。）
+  if (fileType === '') return true;
   return ignoreType.some((typeStr) => {
     return fileType.indexOf(typeStr) !== -1;
   })
@@ -233,7 +235,7 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
   let realReq = httpMethod.request(options, (realRes) => {
     // 对font type的数据不设置为utf-8格式，因为utf-8 格式会导致数据size错误，暂不知道原因
     const contentType = realRes.headers['content-type'];
-    const isIgnoredType = isIgnoredContentType(contentType);
+    const isIgnoredType = isIgnoredContentType(contentType );
     if (isIgnoredType === false) realRes.setEncoding('utf8');
     
     if (realRes.statusCode !== 200) {

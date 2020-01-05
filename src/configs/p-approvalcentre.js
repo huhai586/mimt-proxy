@@ -17,7 +17,7 @@ module.exports={
   proxyedHostname: 'stnew02.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "/ux/p-approvalcentre/release/dist/app-e9bf5a4aaef3f7ea1054.bundle.min.js /app.js",
+      pathRewriteRule: "/ux/p-approvalcentre/release/dist/app-e9bf5a4aaef3f7ea1054.bundle.min.js /bundle.js",
       byPass: 'http://127.0.0.1:8888'
     }
   ]

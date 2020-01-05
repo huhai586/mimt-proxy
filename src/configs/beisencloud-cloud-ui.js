@@ -10,8 +10,9 @@
 module.exports={
   description:'BeisenCloudUI',
   excludePattern: [
+    'talent-libs','ethos','common','main',
     ],
-  includePattern: ['BeisenCloudUI'],
+  includePattern: ['p-beisencloud-core'],
   localServerHostName: 'http://localhost:9090',
   port: 6789,
   proxyedHostname: 'stnew03.beisen.com',
