@@ -9,8 +9,8 @@ const url = require('url');
 const {createOptionsForLocalRequest} = require("./utils");
 
 
-const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, customProxyRules) => {
-  
+const proxyForHttp = (req,res, proxyRule) => {
+  const {proxyedHostname,excludePattern,includePattern, customProxyRules, localServerHostName} = proxyRule;
   // 解析客户端请求
   var urlObject = url.parse(req.url);
   let options =  {
@@ -43,7 +43,7 @@ const proxyForHttp = (req,res, proxyedHostname,excludePattern,includePattern, cu
     includePattern
   );
   if (urlNeedRequestLocal) {
-    requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
+    requestWebpackDevServer(createOptionsForLocalRequest(localServerHostName), res, req);
     // 如果proxyedHostname !== options.hostname,是因为用户重新改写了请求的host,这时候就不能再请求local了
   } else {
     const isHttp = options.protocol === 'http:';

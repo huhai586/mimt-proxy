@@ -4,18 +4,17 @@
  * @localServerHostName string 本地资源服务器hostname
  * @port number 代理服务器运行的端口
  * @proxyedHostname string 只对只对指定hostname的资源进行本地请求
- * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则(暂未支持)
+ * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
 module.exports={
-  description:'协作组件',
-  excludePattern: [
-    'css'
-  ],
-  includePattern: ['p-cooperation'],
-  localServerHostName: 'http://127.0.0.1:3000',
+  description:'Core',
+  excludePattern: [],
+  includePattern: ['p-beisencloud-core'],
+  localServerHostName: 'http://localhost:3000',
   port: 6789,
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
+
   ]
 }

@@ -29,9 +29,9 @@ const wsAbout = {
     const {fileName,fileData} = payload;
     const proxyServer = getProxyServer();
     if (proxyServer) {
-      proxyServer.close && proxyServer.close()
+      // proxyServer.close && proxyServer.close()
     }
-    initProxyServer({config: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData))
+    initProxyServer({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData))
     
   },
   createFile: () => {
@@ -100,7 +100,8 @@ const wsAbout = {
     const params = {action: actions.START_CALLBACK, payload: {...statusObj, fileName, fileData}};
     if (statusObj.startSuc) {
       //存储当前运行的config信息
-      this.currentConfig = {fileName,fileData}
+      this.currentConfig = this.currentConfig || [];
+      this.currentConfig.push({fileName,fileData});
     }
     this.initPacFile();
     // this.ws.send(JSON.stringify(params))
@@ -123,9 +124,7 @@ const wsAbout = {
     return this.currentConfig
   },
   checkLocalVersion:function() {
-    const fileLocation  = process.cwd();
-    const file = fileLocation+'/package.json';
-  
+    const file = path.resolve(__dirname, `../../package.json`);
     const  result=JSON.parse(fs.readFileSync( file));
     return result.version;
   },
@@ -183,7 +182,7 @@ const wsAbout = {
         }
         const info = this.getMatchInfoFromAction(msg);
         if (info === undefined) {
-          console.log("当前msg无返回值", msg);
+          // console.log("当前msg无返回值", msg);
           return;
         }
         const params = {action: msg.action, payload: info};

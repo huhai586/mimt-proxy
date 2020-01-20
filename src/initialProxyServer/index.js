@@ -1,20 +1,57 @@
+
 const http = require('http');
-const {createOptionsForLocalRequest, createOptionFromCli} = require('./utils');
+const {createOptionsForLocalRequest, createOptionFromCli,getProxyRule,configsManage} = require('./utils');
 const ProxyForHttp = require("./proxy-for-http");
 const ProxyForHttps = require("./proxy-for-https");
 
 let httpMitmProxy;
 
-const init = (program, startUpCallBack) => {
-  let {localServerHostName, port, proxyedHostname, excludePattern, customProxyRules, includePattern} = createOptionFromCli(program);
+
+const getMatchConfigForCurRequest = () => {
+
+}
+const init = (configObject, startUpCallBack) => {
+  let {
+    localServerHostName,
+    port,
+    proxyedHostname,
+    excludePattern,
+    customProxyRules,
+    includePattern
+  } = createOptionFromCli(configObject);
+  
+  //存储当前配置
+  configsManage.update({
+    configName:configObject.configName,
+    configData: {localServerHostName,
+      port,
+      proxyedHostname,
+      excludePattern,
+      customProxyRules,
+      includePattern}
+  });
   
   //初始化localRequest options
-  createOptionsForLocalRequest.init(localServerHostName);
+  // createOptionsForLocalRequest.init(localServerHostName,configObject.configName);
+  
+  if (!!httpMitmProxy === true) {startUpCallBack({startSuc: true, msg:'新的配置文件启动成功'});return};
+  startProxyServer(startUpCallBack);
+}
+const shutDownServer = (callback) => {
+  httpMitmProxy.close && httpMitmProxy.close(callback);
+}
+
+const getProxyServer = () => {
+  return httpMitmProxy
+}
+
+const startProxyServer = (startUpCallBack) => {
+  const port = 6789;
   httpMitmProxy = new http.Server();
 
 // 代理http请求
   httpMitmProxy.on('request', (req, res) => {
-    ProxyForHttp(req,res,proxyedHostname, excludePattern, includePattern,customProxyRules);
+    ProxyForHttp(req,res,getProxyRule(req.url));
     res.on('error', () => {
       console.log('😩响应异常中断')
     })
@@ -28,11 +65,6 @@ const init = (program, startUpCallBack) => {
       console.log('😩响应异常中断');
     })
   });
-  
-  
-  
-  
-  
   
   httpMitmProxy.listen(port, function () {
     const msg = `💚HTTP/HTTPS中间人代理启动成功，端口：${port}`
@@ -49,13 +81,6 @@ const init = (program, startUpCallBack) => {
       console.error(e);
     }
   });
-}
-const shutDownServer = (callback) => {
-  httpMitmProxy.close && httpMitmProxy.close(callback);
-}
-
-const getProxyServer = () => {
-  return httpMitmProxy
 }
 module.exports = {
   initProxyServer: init,

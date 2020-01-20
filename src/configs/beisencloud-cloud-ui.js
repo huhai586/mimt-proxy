@@ -10,7 +10,7 @@
 module.exports={
   description:'BeisenCloudUI',
   excludePattern: [
-    'talent-libs','ethos','common','main',
+    'talent-libs','ethos','common','main','IframeContainer','DetailPage'
     ],
   includePattern: ['p-beisencloud-core'],
   localServerHostName: 'http://localhost:9090',

@@ -178,7 +178,7 @@ const isPathMatchRule = (urlPath,excludeArray, includeArray) => {
   })
   return matchExclude && matchInclude
 }
-const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArray, includeArray) => {
+const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArray = [], includeArray = []) => {
   if (proxyedHostname !== urlHostName) return false;
   return isPathMatchRule(urlPath,excludeArray, includeArray)
 }
@@ -287,42 +287,39 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
 /**
  * 设置默认参数
  * **/
-const createOptionsForLocalRequest = {
-  init: function(localServerHostName){
-    const urlOption = url.parse(localServerHostName);
+const createOptionsForLocalRequest = (localServerHostName) => {
+      const urlOption = url.parse(localServerHostName);
+      const {hostname, port, protocol} = urlOption;
+      this.hostname = hostname;
+      this.port = port;
+      this.protocol = protocol;
+      
+      const optionsDefault= {
+        protocol: 'http:',
+          hostname: "localhost",
+          method: 'GET',
+          port: 3000,
+          path: '/webpack-dev-server'
+      }
+      return {
+        protocol: this.protocol || optionsDefault.protocol,
+        hostname: this.hostname || optionsDefault.hostname,
+        port: this.port || optionsDefault.port,
+        path: optionsDefault.path,
+        method: optionsDefault.method
+      }
     
-    const {hostname, port, protocol} = urlOption;
-    this.hostname = hostname;
-    this.port = port;
-    this.protocol = protocol;
-  },
-  optionsDefault: {
-    protocol: 'http:',
-    hostname: "localhost",
-    method: 'GET',
-    port: 3000,
-    path: '/webpack-dev-server'
-  },
-  getOptions: function(){
-    const {optionsDefault} = this;
-    return {
-      protocol: this.protocol || optionsDefault.protocol,
-      hostname: this.hostname || optionsDefault.hostname,
-      port: this.port || optionsDefault.port,
-      path: optionsDefault.path,
-      method: optionsDefault.method
-    }
-  }
-};
-
-
-const createOptionFromCli = (program) => {
   
+}
+
+
+const createOptionFromCli = (configObject) => {
+  const program = configObject;
   let configValue = {}
-  const config = program.config;
+  const configName = program.configName;
   const currentDirection = process.cwd();
-  if (config) {
-    const configFileAddress = path.join(__dirname,`../configs/${config}`);
+  if (configName) {
+    const configFileAddress = path.join(__dirname,`../configs/${configName}`);
     configValue = require(configFileAddress);
   }
   
@@ -426,7 +423,71 @@ const showMessage = {
     );
   }
 }
+const configsManage = (function(){
+  const  allConfigs = {}
+  return {
+    noProperty: function(configDataObj,propertyName){
+      const noAttr = configDataObj[propertyName] === undefined;
+      if (noAttr) {
+        console.log(`配置文件中，没有必填项目${propertyName}，请检查!,当前配置文件将被忽略`)
+      };
+      return noAttr;
+    },
+    verifyConfigData: function(configDataObj){
+      // 验证配置文件里面有如下必须值
+      const mustProperty = ['localServerHostName',
+        'port',
+        'proxyedHostname',
+        'excludePattern',
+        'includePattern'];
+      const hasAllProperty = !mustProperty.some(this.noProperty.bind(this,configDataObj));
+      return hasAllProperty;
+    
+    },
+    update: function(configObj){
+      const {configName, configData} = configObj;
+      const verifySuc = this.verifyConfigData(configData);
+      if (verifySuc === false) {
+        console.log(`${configName} 配置文件格式有误，不能被添加`)
+      } else {
+        allConfigs[configName] = configData;
+      }
+    },
+    getConfigByFileName: function(fileName){
+      return allConfigs[fileName]
+    },
+    getAllConfigs: function(){
+      return allConfigs
+    }
+  }
+})();
 
+const getProxyRule = function(urlString){
+  //从config中找到合适的配置
+  //满足条件：符合proxyedHostname、includePattern、excludePattern
+  const allConfigs = configsManage.getAllConfigs();
+  const configsInArray = Object.values(allConfigs);
+  var urlObject = url.parse(urlString);
+
+    const configMatched = configsInArray.filter((config) => {
+      const urlHostName = urlObject.hostname;
+      const urlPath = urlObject.path;
+      const {proxyedHostname, excludePattern:excludeArray, includePattern:includeArray} = config;
+      return isUrlNeedRequestLocal(proxyedHostname, urlHostName,urlPath, excludeArray, includeArray)
+  });
+  
+  if (configMatched.length === 0) {
+    console.log("没有配置文件符合当前的url", urlString);
+    return
+  }
+  if (configMatched.length === 1) {
+    return configMatched[0]
+  }
+  if (configMatched.length > 1) {
+    console.log("找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确");
+    return configMatched[0]
+  }
+};
 exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;
@@ -438,3 +499,5 @@ exports.createOptionFromCli = createOptionFromCli;
 exports.createOptionsFromCustomRule = createOptionsFromCustomRule;
 exports.getUrlFromOptions = getUrlFromOptions;
 exports.showMessage = showMessage;
+exports.configsManage = configsManage;
+exports.getProxyRule = getProxyRule;
