@@ -3,6 +3,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const actions = require("../consts");
 const {getIP} = require("../common/utils");
+const {configsManage} = require("../initialProxyServer/utils");
 const {initProxyServer, getProxyServer} = require("../initialProxyServer");
 const NpmApi= require('npm-api');
 const open = require('open');
@@ -31,7 +32,7 @@ const wsAbout = {
     if (proxyServer) {
       // proxyServer.close && proxyServer.close()
     }
-    initProxyServer({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData))
+    initProxyServer({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData),this.selectPort)
     
   },
   createFile: () => {
@@ -98,11 +99,7 @@ const wsAbout = {
   },
   startUpCallBack: function(fileName,fileData, statusObj){
     const params = {action: actions.START_CALLBACK, payload: {...statusObj, fileName, fileData}};
-    if (statusObj.startSuc) {
-      //存储当前运行的config信息
-      this.currentConfig = this.currentConfig || [];
-      this.currentConfig.push({fileName,fileData});
-    }
+
     this.initPacFile();
     // this.ws.send(JSON.stringify(params))
     this.sendMessage(params);
@@ -121,7 +118,7 @@ const wsAbout = {
   },
   
   getCurrentConfig: function(){
-    return this.currentConfig
+    return configsManage.getAllConfigs();
   },
   checkLocalVersion:function() {
     const file = path.resolve(__dirname, `../../package.json`);
@@ -145,6 +142,11 @@ const wsAbout = {
       this.versionCompare(latestVersion,localVersion)
     })
   },
+  stopConfig: function(fileName){
+    configsManage.deleteConfig(fileName);
+    const params = {action: actions.GET_CURRENT_CONFIG, payload: this.getCurrentConfig()};
+    this.sendMessage(params);
+  },
   getMatchInfoFromAction: function(msgJson) {
     switch (msgJson.action) {
       case actions.FETCH_ALL_CONFIGS:
@@ -160,6 +162,9 @@ const wsAbout = {
          break;
       case actions.CHECK_UPDATE:
          this.checkUpdate(msgJson.payload);
+         break;
+      case actions.STOP_CONFIG:
+         return this.stopConfig(msgJson.payload);
          break;
       default :
         console.log("未找到对应数据",msgJson.action);
@@ -191,7 +196,10 @@ const wsAbout = {
       
     });
   },
-  initWsAndHttpServer: function(){
+  initWsAndHttpServer: function(port = 6789){
+    // 设置唯一端口
+    if(!!this.selectPort === false) this.selectPort =  port;
+
     //启动ws
     this.initWs();
     //启动http server

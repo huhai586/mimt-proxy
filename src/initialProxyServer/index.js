@@ -10,32 +10,31 @@ let httpMitmProxy;
 const getMatchConfigForCurRequest = () => {
 
 }
-const init = (configObject, startUpCallBack) => {
-  let {
-    localServerHostName,
-    port,
-    proxyedHostname,
-    excludePattern,
-    customProxyRules,
-    includePattern
-  } = createOptionFromCli(configObject);
+const init = (configObject, startUpCallBack, port) => {
+  const initOptions = createOptionFromCli(configObject);
+  // let {
+  //   localServerHostName,
+  //   port,
+  //   proxyedHostname,
+  //   excludePattern,
+  //   customProxyRules,
+  //   includePattern
+  // } = initOptions;
   
   //存储当前配置
   configsManage.update({
     configName:configObject.configName,
-    configData: {localServerHostName,
-      port,
-      proxyedHostname,
-      excludePattern,
-      customProxyRules,
-      includePattern}
+    configData: initOptions
   });
   
   //初始化localRequest options
   // createOptionsForLocalRequest.init(localServerHostName,configObject.configName);
   
-  if (!!httpMitmProxy === true) {startUpCallBack({startSuc: true, msg:'新的配置文件启动成功'});return};
-  startProxyServer(startUpCallBack);
+  if (!!httpMitmProxy === true) {
+    startUpCallBack({startSuc: true, msg:`新配置文件${configObject.configName}已经生效`});
+    return
+  };
+  startProxyServer(startUpCallBack, port);
 }
 const shutDownServer = (callback) => {
   httpMitmProxy.close && httpMitmProxy.close(callback);
@@ -45,8 +44,7 @@ const getProxyServer = () => {
   return httpMitmProxy
 }
 
-const startProxyServer = (startUpCallBack) => {
-  const port = 6789;
+const startProxyServer = (startUpCallBack, port = 6789) => {
   httpMitmProxy = new http.Server();
 
 // 代理http请求
@@ -60,7 +58,7 @@ const startProxyServer = (startUpCallBack) => {
 // 代理https请求
 // https的请求通过http隧道方式转发
   httpMitmProxy.on('connect', (req, cltSocket, head) => {
-    ProxyForHttps(req,cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules);
+    ProxyForHttps(req,cltSocket, head);
     cltSocket.on('error', () => {
       console.log('😩响应异常中断');
     })

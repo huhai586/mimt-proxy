@@ -19,7 +19,7 @@ program
 if(program.config === undefined) {
   //如果没有相应的配置文件，那么运行友好页面提示用户选择配置
   //启动后台服务+启动网页
-  wsAbout.initWsAndHttpServer();
+  wsAbout.initWsAndHttpServer(program.port);
   
 } else {
   initProxyServer(program)

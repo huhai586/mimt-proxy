@@ -8,7 +8,8 @@ const {
   isUrlNeedRequestLocal,
   requestRealTarget,
   createOptionsForLocalRequest,
-  createOptionsFromCustomRule
+  createOptionsFromCustomRule,
+  getProxyRule
 } = require('./utils');
 const caCertPath = path.join(__dirname, '../rootCA/rootCA.crt');
 const caKeyPath = path.join(__dirname, '../rootCA/rootCA.key.pem');
@@ -36,7 +37,7 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @param  {[type]} successFun [description]
  * @return {[type]}            [description]
  */
-function createFakeHttpsWebSite(domain, successFun, excludePattern, includePattern, customProxyRules, proxyedHostname) {
+function createFakeHttpsWebSite(domain, successFun) {
   
   const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
@@ -60,29 +61,44 @@ function createFakeHttpsWebSite(domain, successFun, excludePattern, includePatte
       path: req.url,
       headers: req.headers,
     };
-  
-    httpsOptions = createOptionsFromCustomRule(customProxyRules, httpsOptions,req.url, proxyedHostname, excludePattern, includePattern);
-    req.url = httpsOptions.path;
-    const urlNeedRequestLocal = isUrlNeedRequestLocal(
-      proxyedHostname,
-      httpsOptions.hostname,
-      httpsOptions.path,
-      excludePattern,
-      includePattern
-    );
-    
-    if (urlNeedRequestLocal) {
-      requestWebpackDevServer(createOptionsForLocalRequest.getOptions(), res, req);
+    const matchConfig = getProxyRule(`${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`);
+      // excludePattern, includePattern, customProxyRules, proxyedHostname
+    if (matchConfig) {
+      // 有匹配的proxy文件
+      const {customProxyRules, proxyedHostname, excludePattern, includePattern } = matchConfig;
+      httpsOptions = createOptionsFromCustomRule(httpsOptions,req.url,customProxyRules, proxyedHostname, excludePattern, includePattern);
+      req.url = httpsOptions.path;
+      // 由于做了customRule判断，可能导致
+      readyRequest(httpsOptions,matchConfig,res,req)
     } else {
-      const isHttp = httpsOptions.protocol === 'http:';
-      httpsOptions.headers.host = httpsOptions.hostname;
-      requestRealTarget(httpsOptions, req, res, isHttp)
+      //  无匹配的proxy文件
+      requestRealTarget(httpsOptions, req, res, false)
+      return;
     }
   });
   fakeServer.on('error', (e) => {
     console.error(e);
   });
   
+}
+function readyRequest(httpsOptions,matchConfig,res,req){
+  const {proxyedHostname,excludePattern,includePattern} = matchConfig.fileData;
+  const urlNeedRequestLocal = isUrlNeedRequestLocal(
+    proxyedHostname,
+    httpsOptions.hostname,
+    httpsOptions.path,
+    excludePattern,
+    includePattern
+  );
+  
+  if (urlNeedRequestLocal) {
+    requestWebpackDevServer(createOptionsForLocalRequest(matchConfig.fileData.localServerHostName), res, req);
+  } else {
+    console.log("当前请求不需要走本地")
+    const isHttp = httpsOptions.protocol === 'http:';
+    httpsOptions.headers.host = httpsOptions.hostname;
+    requestRealTarget(httpsOptions, req, res, isHttp)
+  }
 }
 
 /**

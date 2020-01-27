@@ -15,8 +15,8 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
   }
   
   
-  if(srvUrl.hostname === proxyedHostname ) {
-    //
+  if(true ) {
+    //只有解析https完整url才能知道是否应该做proxy
     createFakeHttpsWebSite(srvUrl.hostname, (port) => {
       let srvSocket = net.connect(port, '127.0.0.1', () => {
       
@@ -31,7 +31,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
       srvSocket.on('error', (e) => {
         console.error('🔔',e);
       });
-    }, excludePattern, includePattern, customProxyRules, proxyedHostname)
+    })
     
   } else {
     // 对非stnew03.beisen.com的内容直接转发

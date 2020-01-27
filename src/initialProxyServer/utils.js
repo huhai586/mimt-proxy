@@ -325,7 +325,7 @@ const createOptionFromCli = (configObject) => {
   
   let options = {
     localServerHostName:  configValue.localServerHostName || program.localServerHostName,
-    port: configValue.port || program.port,
+    // port: configValue.port || program.port,
     proxyedHostname:  configValue.proxyedHostname || program.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
     includePattern: configValue.includePattern,
@@ -344,7 +344,7 @@ const deleteBlankItemInArray = (arr) => {
  * 解析customeRule
  * **/
 
-const createOptionsFromCustomRule = (customProxyRules = [],originOptions, originUrl, proxyedHostname, excludePattern, includePattern) => {
+const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules = [], proxyedHostname, excludePattern, includePattern) => {
   
   //
   
@@ -408,6 +408,7 @@ const getUrlFromOptions = (options) => {
   return options.protocol + options.hostname + ":" +options.port + options.path;
 }
 
+const add = path.join(__dirname, '../images/horrible.png');
 
 const showMessage = {
   error: (e) => {
@@ -416,7 +417,7 @@ const showMessage = {
         title: '请求出错了!',
         subtitle: e.subtitle,
         message: e.message,
-        icon: path.join(__dirname, '/images/horrible.png'), // Absolute path (doesn't work on balloons)
+        icon: add, // Absolute path (doesn't work on balloons)
         sound: true, // Only Notification Center or Windows Toasters
         wait: false // Wait with callback, until user action is taken against notification,
       }
@@ -436,7 +437,6 @@ const configsManage = (function(){
     verifyConfigData: function(configDataObj){
       // 验证配置文件里面有如下必须值
       const mustProperty = ['localServerHostName',
-        'port',
         'proxyedHostname',
         'excludePattern',
         'includePattern'];
@@ -456,8 +456,16 @@ const configsManage = (function(){
     getConfigByFileName: function(fileName){
       return allConfigs[fileName]
     },
+    deleteConfig:function(fileName, callback){
+      delete allConfigs[fileName];
+      callback && callback();
+    },
     getAllConfigs: function(){
-      return allConfigs
+      const temArr = [];
+      for(let p in allConfigs) {
+        temArr.push({fileName: p, fileData: allConfigs[p]});
+      }
+      return temArr;
     }
   }
 })();
@@ -467,12 +475,12 @@ const getProxyRule = function(urlString){
   //满足条件：符合proxyedHostname、includePattern、excludePattern
   const allConfigs = configsManage.getAllConfigs();
   const configsInArray = Object.values(allConfigs);
-  var urlObject = url.parse(urlString);
+  const urlObject = url.parse(urlString);
 
     const configMatched = configsInArray.filter((config) => {
       const urlHostName = urlObject.hostname;
       const urlPath = urlObject.path;
-      const {proxyedHostname, excludePattern:excludeArray, includePattern:includeArray} = config;
+      const {proxyedHostname, excludePattern:excludeArray, includePattern:includeArray} = config.fileData;
       return isUrlNeedRequestLocal(proxyedHostname, urlHostName,urlPath, excludeArray, includeArray)
   });
   
