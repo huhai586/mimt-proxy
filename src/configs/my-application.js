@@ -1,4 +1,4 @@
-    /**
+/**
  * @excludePattern regexp|string[] hostname下 请求资源url path中如果匹配这个字段，这个资源不会被代理到本地，直接访问原始资源
  * @includePattern regexp|string[] hostname下 请求资源url path必须include 相应字段才能被代理到本地
  * @localServerHostName string 本地资源服务器hostname
@@ -8,10 +8,16 @@
  *
  * **/
 module.exports={
-  description:'百度js测试',
+  description:'我的申请组件',
   excludePattern: [],
-  includePattern: ['static/superman/js/lib/jquery-1.10.2_1c4228b8.js'],
-  localServerHostName: 'http://localhost:3000',
+  includePattern: ['ux-approval-centre'],
+  localServerHostName: 'http://localhost:8080',
   
-  proxyedHostname: 'ss0.bdstatic.com'
+  proxyedHostname: 'stnew.beisen.com',
+  customProxyRules: [
+    {
+      pathRewriteRule: "main-3.0.12.min main",
+      // byPass: 'http://10.99.28.143:3001'
+    }
+  ]
 }

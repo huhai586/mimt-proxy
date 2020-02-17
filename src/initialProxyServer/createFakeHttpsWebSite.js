@@ -82,7 +82,7 @@ function createFakeHttpsWebSite(domain, successFun) {
   
 }
 function readyRequest(httpsOptions,matchConfig,res,req){
-  const {proxyedHostname,excludePattern,includePattern} = matchConfig.fileData;
+  const {proxyedHostname,excludePattern,includePattern} = matchConfig;
   const urlNeedRequestLocal = isUrlNeedRequestLocal(
     proxyedHostname,
     httpsOptions.hostname,
@@ -92,7 +92,7 @@ function readyRequest(httpsOptions,matchConfig,res,req){
   );
   
   if (urlNeedRequestLocal) {
-    requestWebpackDevServer(createOptionsForLocalRequest(matchConfig.fileData.localServerHostName), res, req);
+    requestWebpackDevServer(createOptionsForLocalRequest(matchConfig.localServerHostName), res, req);
   } else {
     console.log("当前请求不需要走本地")
     const isHttp = httpsOptions.protocol === 'http:';

@@ -489,11 +489,11 @@ const getProxyRule = function(urlString){
     return
   }
   if (configMatched.length === 1) {
-    return configMatched[0]
+    return configMatched[0].fileData
   }
   if (configMatched.length > 1) {
     console.log("找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确");
-    return configMatched[0]
+    return configMatched[0].fileData
   }
 };
 exports.extractAsset = extractAsset;

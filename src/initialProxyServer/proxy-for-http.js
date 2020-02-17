@@ -10,9 +10,8 @@ const {createOptionsForLocalRequest} = require("./utils");
 
 
 const proxyForHttp = (req,res, proxyRule) => {
-  const {proxyedHostname,excludePattern,includePattern, customProxyRules, localServerHostName} = proxyRule;
   // 解析客户端请求
-  var urlObject = url.parse(req.url);
+  let urlObject = url.parse(req.url);
   let options =  {
     protocol: 'http:',
     hostname: req.headers.host.split(':')[0],
@@ -22,6 +21,12 @@ const proxyForHttp = (req,res, proxyRule) => {
     headers: req.headers,
   };
   
+  if (!!proxyRule === false) {
+    console.log(`当前url${req.url}无相应配置文件，系统将直接请求原地址`);
+    return requestRealTarget(options, req, res, true);
+  }
+  const {proxyedHostname,excludePattern,includePattern, customProxyRules, localServerHostName} = proxyRule;
+  
   // 为了方便起见，直接去掉客户端请求所支持的压缩方式
   delete options.headers['accept-encoding'];
   
@@ -30,7 +35,7 @@ const proxyForHttp = (req,res, proxyRule) => {
   // 请求webpack-dev-server 服务文件list;
   // 如果请求域名 + 域名的path 未在exclude名单内，那么就requestLocal
   
-  options = createOptionsFromCustomRule(customProxyRules, options,req.url, proxyedHostname, excludePattern, includePattern);
+  options = createOptionsFromCustomRule(options,req.url,customProxyRules, proxyedHostname, excludePattern, includePattern);
   
   const requestUrlAfterRewrite = getUrlFromOptions(options);
   req.url = requestUrlAfterRewrite;

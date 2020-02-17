@@ -30,7 +30,7 @@ npm install b-proxy-cli -g
 ###使用
 
 ```angular2
-b-proxy-cli --config ./proxy-config-extend.js
+在控制台中直接输入 b-proxy-cli 并运行
 ```
 配置文件demo
 ```angular2
@@ -113,11 +113,8 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 
 ### 运行方法
 
-* 使用命令行
+* 使用命令
     b-proxy-cli 
-    具体参数请使用 b-proxy-cli -h
-* 使用配置文件
-    b-proxy-cli --config configFile.js
     
 运行起来后，请在系统的http代理中配置代理服务器运行的ip + 端口，
 
@@ -161,11 +158,24 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.4.5
+
+feature: 新增'我的申请'组件配置文档
+style：优化readme
+1.4.4
+
+bugfix: 代理请求的是否找不到正确的config会直接crash
+
 1.4.3
+
 feature: 支持同时运行多个proxy config
+
 1.4.1
+
 feature: 优化友好页面，使其支持编辑配置 + 新版本检测 功能
+
 1.3.9
+
 bugfix： 对字体文件使用utf-8编码后导致字体size尺寸不对
 
 1.3.6
