@@ -9,7 +9,7 @@
  * **/
 module.exports={
   description:'流程设置',
-  excludePattern: ['webpack-bootstrap', 'vendors'],
+  excludePattern: ['webpack-bootstrap', 'vendors','BeisenCloudUI'],
   includePattern: ['p-beisencloud-setting'],
   localServerHostName: 'http://localhost:3001',
   

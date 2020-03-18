@@ -8,10 +8,10 @@
  *
  * **/
 module.exports={
-  description:'BeisenCloudUI',
+  description:'ux-task-drawer',
   excludePattern: [],
-  includePattern: ['BeisenCloudUI'],
-  localServerHostName: 'http://localhost:9090',
+  includePattern: ['ux-task-drawer'],
+  localServerHostName: 'http://localhost:3005',
   
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: []

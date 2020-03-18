@@ -8,11 +8,13 @@
  *
  * **/
 module.exports={
-  description:'BeisenCloudUI',
+  description:'ethos',
   excludePattern: [],
-  includePattern: ['BeisenCloudUI'],
-  localServerHostName: 'http://localhost:9090',
+  includePattern: ['ethos'],
+  localServerHostName: 'http://localhost:3002',
   
   proxyedHostname: 'stnew03.beisen.com',
-  customProxyRules: []
+  customProxyRules: [
+    {pathRewriteRule:"ethos(.*).bundle.min.js ethos.js"}
+]
 }

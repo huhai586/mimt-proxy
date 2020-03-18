@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const os = require('os');
 const actions = require("../consts");
 const {getIP} = require("../common/utils");
 const {configsManage} = require("../initialProxyServer/utils");
@@ -41,7 +42,7 @@ const wsAbout = {
     const curIP = getIP();
     
     // 创建file并写入friendPage\build
-  
+    
     const str = `
       function FindProxyForURL(url, host) {
         return "PROXY ${curIP}:${port}";
@@ -88,29 +89,37 @@ const wsAbout = {
     console.log('当前的路径',__dirname)
     // const fileLocation  = process.cwd();
     const configFilePosition2 = path.resolve(__dirname, `../configs/${data.fileName}`);
+    const configFilePosition1 = path.resolve(__dirname, `../configs`);
     console.log('当前的路径',configFilePosition2)
-  
-    exec(`open -R ${configFilePosition2}`, (err, stdout, stderr) => {
-      if(err) {
-        console.log('打开文件夹错误',err, stdout, stderr);
-        return;
+    const env = os.platform();
+    if (env === 'win32') {
+      try {exec(`explorer.exe /select, ${configFilePosition2}`)} catch (e) {
+        console.log("打开文件夹出错")
       }
-    })
+    } else {
+      exec(`open -R ${configFilePosition2}`, (err, stdout, stderr) => {
+        if(err) {
+          console.log('打开文件夹错误',err, stdout, stderr);
+          return;
+        }
+      })
+    }
+    
   },
   startUpCallBack: function(fileName,fileData, statusObj){
     const params = {action: actions.START_CALLBACK, payload: {...statusObj, fileName, fileData}};
-
+    
     this.initPacFile();
     // this.ws.send(JSON.stringify(params))
     this.sendMessage(params);
-
+    
   },
   sendMessage: function(params){
     this.wss.clients.forEach(function each(client) {
-    
+      
       // console.log('IT IS GETTING INSIDE CLIENTS');
       // console.log(client);
-    
+      
       // The data is coming in correctly
       // console.log(data);
       client.send(JSON.stringify(params));
@@ -158,17 +167,17 @@ const wsAbout = {
       case actions.GET_PAC_ADDRESS:
         return this.getPacAddress()
       case actions.EDIT_CONFIG:
-         this.openConfigFile(msgJson.payload);
-         break;
+        this.openConfigFile(msgJson.payload);
+        break;
       case actions.CHECK_UPDATE:
-         this.checkUpdate(msgJson.payload);
-         break;
+        this.checkUpdate(msgJson.payload);
+        break;
       case actions.STOP_CONFIG:
-         return this.stopConfig(msgJson.payload);
-         break;
+        return this.stopConfig(msgJson.payload);
+        break;
       default :
         console.log("未找到对应数据",msgJson.action);
-    
+      
     }
   },
   initWs: function() {
@@ -199,7 +208,7 @@ const wsAbout = {
   initWsAndHttpServer: function(port = 6789){
     // 设置唯一端口
     if(!!this.selectPort === false) this.selectPort =  port;
-
+    
     //启动ws
     this.initWs();
     //启动http server
@@ -212,7 +221,7 @@ const wsAbout = {
       console.log('app listening on port 1347!');
       open("http://localhost:1347");
     })
-  
+    
   }
 };
 

@@ -231,7 +231,6 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
     options.headers['cache-control'] = 'no-store';
   }
   
-  
   let realReq = httpMethod.request(options, (realRes) => {
     // 对font type的数据不设置为utf-8格式，因为utf-8 格式会导致数据size错误，暂不知道原因
     const contentType = realRes.headers['content-type'];

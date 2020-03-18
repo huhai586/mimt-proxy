@@ -1,5 +1,5 @@
 
       function FindProxyForURL(url, host) {
-        return "PROXY 10.129.212.79:6789";
+        return "PROXY 192.168.115.1:6789";
       }
     

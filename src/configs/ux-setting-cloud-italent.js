@@ -24,7 +24,7 @@ module.exports={
       pathReplaceFunc: (matchStr, $1,$2,originStr) => {
         return  '/'+ $2.replace(/-[\d]+\.min/,'');
       },
-      byPass: 'http://localhost:8000'
+      byPass: 'http://localhost:8001'
     }
   ]
 }

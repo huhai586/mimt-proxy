@@ -9,7 +9,7 @@
  * **/
 module.exports={
   description:'翻译工作台',
-  excludePattern: [],
+  excludePattern: ['ethos'],
   includePattern: ['p-beisencloud-multilanguagecenter'],
   localServerHostName: 'http://localhost:3333',
   

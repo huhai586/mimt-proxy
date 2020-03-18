@@ -8,11 +8,13 @@
  *
  * **/
 module.exports={
-  description:'BeisenCloudUI',
+  description:'Talent-core',
   excludePattern: [],
-  includePattern: ['BeisenCloudUI'],
-  localServerHostName: 'http://localhost:9090',
+  includePattern: ['talent-core'],
+  localServerHostName: 'http://localhost:8080',
   
   proxyedHostname: 'stnew03.beisen.com',
-  customProxyRules: []
+  customProxyRules: [
+    // {pathRewriteRule:"talent-libs-1.0.30.min.js talent-libs-1.0.74.min.js"}
+  ]
 }

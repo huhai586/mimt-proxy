@@ -61,6 +61,7 @@ function createFakeHttpsWebSite(domain, successFun) {
       path: req.url,
       headers: req.headers,
     };
+    
     const matchConfig = getProxyRule(`${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`);
       // excludePattern, includePattern, customProxyRules, proxyedHostname
     if (matchConfig) {

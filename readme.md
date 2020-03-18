@@ -158,6 +158,12 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.4.7
+
+feature: pac配置支持友好提示\windows现支持打开文件夹了
+
+bugfix: 刷新页面后不能获取到正确的pac地址
+
 1.4.5
 
 feature: 新增'我的申请'组件配置文档

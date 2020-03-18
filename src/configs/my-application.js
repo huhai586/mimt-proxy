@@ -16,8 +16,7 @@ module.exports={
   proxyedHostname: 'stnew.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "main-3.0.12.min main",
-      // byPass: 'http://10.99.28.143:3001'
+      pathRewriteRule:"main-3.0.14.min main-3.0.15.min"
     }
   ]
 }

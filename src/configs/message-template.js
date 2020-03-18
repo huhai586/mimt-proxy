@@ -8,11 +8,13 @@
  *
  * **/
 module.exports={
-  description:'BeisenCloudUI',
+  description:'消息模板',
   excludePattern: [],
-  includePattern: ['BeisenCloudUI'],
-  localServerHostName: 'http://localhost:9090',
+  includePattern: ['message-platform'],
+  localServerHostName: 'http://localhost:3000',
   
-  proxyedHostname: 'stnew03.beisen.com',
-  customProxyRules: []
+  proxyedHostname: 'xfile5.tita.com',
+  customProxyRules: [
+    {pathRewriteRule:"ethos(.*).bundle.min.js ethos.js"}
+]
 }
