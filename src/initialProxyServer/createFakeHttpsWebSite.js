@@ -62,7 +62,8 @@ function createFakeHttpsWebSite(domain, successFun) {
       headers: req.headers,
     };
     
-    const matchConfig = getProxyRule(`${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`);
+    const urlStr = `${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`;
+    const matchConfig = getProxyRule(urlStr);
       // excludePattern, includePattern, customProxyRules, proxyedHostname
     if (matchConfig) {
       // 有匹配的proxy文件
@@ -73,6 +74,7 @@ function createFakeHttpsWebSite(domain, successFun) {
       readyRequest(httpsOptions,matchConfig,res,req)
     } else {
       //  无匹配的proxy文件
+      console.log("无match配置文件，直接请求地址: ",urlStr)
       requestRealTarget(httpsOptions, req, res, false)
       return;
     }

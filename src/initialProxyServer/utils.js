@@ -232,13 +232,16 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
   }
   
   let realReq = httpMethod.request(options, (realRes) => {
+    console.log("statusCode", realRes.statusCode);
+    const {statusCode} = realRes;
+    const allowStatusCode = [200, 302, 301]
     // 对font type的数据不设置为utf-8格式，因为utf-8 格式会导致数据size错误，暂不知道原因
     const contentType = realRes.headers['content-type'];
     const isIgnoredType = isIgnoredContentType(contentType );
     if (isIgnoredType === false) realRes.setEncoding('utf8');
     
-    if (realRes.statusCode !== 200) {
-      res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage);
+    if (!allowStatusCode.includes(statusCode)) {
+      res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage + " 代理的文件无法访问");
       return
     }
 
