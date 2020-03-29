@@ -10,7 +10,7 @@
 module.exports={
   description:'Talent-core',
   excludePattern: [],
-  includePattern: ['talent-core'],
+  includePattern: ['talent-libs'],
   localServerHostName: 'http://localhost:8080',
   
   proxyedHostname: 'stnew03.beisen.com',

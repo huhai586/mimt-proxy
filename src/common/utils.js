@@ -5,7 +5,7 @@ const getIP = () => {
     var iface = interfaces[devName];
     for(var i=0;i<iface.length;i++){
       var alias = iface[i];
-      if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal &&(alias.netmask !== '255.255.0.0')){
+      if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal &&(alias.netmask !== '255.255.0.0') && (alias.netmask !== '255.255.255.0')){
         IPAdress = alias.address;
       }
     }

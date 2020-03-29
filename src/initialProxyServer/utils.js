@@ -240,10 +240,10 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
     const isIgnoredType = isIgnoredContentType(contentType );
     if (isIgnoredType === false) realRes.setEncoding('utf8');
     
-    if (!allowStatusCode.includes(statusCode)) {
-      res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage + " 代理的文件无法访问");
-      return
-    }
+    // if (!allowStatusCode.includes(statusCode)) {
+    //   res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage + " 代理的文件无法访问");
+    //   return
+    // }
 
     if (isIgnoredType === true) {
       setHeader(realRes, res);
@@ -411,6 +411,7 @@ const getUrlFromOptions = (options) => {
 }
 
 const add = path.join(__dirname, '../images/horrible.png');
+const thinking = path.join(__dirname, '../images/thinking.png');
 
 const showMessage = {
   error: (e) => {
@@ -422,6 +423,19 @@ const showMessage = {
         icon: add, // Absolute path (doesn't work on balloons)
         sound: true, // Only Notification Center or Windows Toasters
         wait: false // Wait with callback, until user action is taken against notification,
+      }
+    );
+  },
+  warnning: (e) => {
+    notifier.notify(
+      {
+        title: '警告',
+        subtitle: e.subtitle,
+        message: e.message,
+        open:e.open,
+        icon: thinking, // Absolute path (doesn't work on balloons)
+        sound: true, // Only Notification Center or Windows Toasters
+        wait: true // Wait with callback, until user action is taken against notification,
       }
     );
   }
@@ -472,6 +486,15 @@ const configsManage = (function(){
   }
 })();
 
+const isMatchHostName = (hostName = '') => {
+  const allConfigs = configsManage.getAllConfigs();
+  const configsInArray = Object.values(allConfigs);
+  return configsInArray.some((v) => {
+    const {fileData = {}} = v;
+    const {proxyedHostname = ''} = fileData;
+    return hostName === proxyedHostname
+  })
+}
 const getProxyRule = function(urlString){
   //从config中找到合适的配置
   //满足条件：符合proxyedHostname、includePattern、excludePattern
@@ -494,7 +517,13 @@ const getProxyRule = function(urlString){
     return configMatched[0].fileData
   }
   if (configMatched.length > 1) {
-    console.log("找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确");
+    const e = {};
+    const fileName = urlString.replace(/(.*)\/(.*)$/,'$2');
+    console.log(`${urlString}找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确`);
+    e.subtitle = `资源匹配到多个代理规则,可能匹配出错,请细化规则`;
+    e.message = `点击访问${fileName}}`;
+    e.open = urlString
+    showMessage.warnning(e);
     return configMatched[0].fileData
   }
 };
@@ -511,3 +540,4 @@ exports.getUrlFromOptions = getUrlFromOptions;
 exports.showMessage = showMessage;
 exports.configsManage = configsManage;
 exports.getProxyRule = getProxyRule;
+exports.isMatchHostName = isMatchHostName;

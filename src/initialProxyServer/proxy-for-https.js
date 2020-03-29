@@ -1,5 +1,6 @@
 const url = require('url');
 const net = require('net');
+const {isMatchHostName} = require("./utils");
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 
 
@@ -14,8 +15,10 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
     console.log('异常');
   }
   
+  //初次检查，不符合的hostname直接转发
+  const isMatchHostNameCheck = isMatchHostName(srvUrl.hostname);
   
-  if(true ) {
+  if(isMatchHostNameCheck ) {
     //只有解析https完整url才能知道是否应该做proxy
     createFakeHttpsWebSite(srvUrl.hostname, (port) => {
       let srvSocket = net.connect(port, '127.0.0.1', () => {
