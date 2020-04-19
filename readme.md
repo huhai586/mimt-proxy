@@ -158,6 +158,12 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.4.11
+
+bugfix: 配置文件读取bug
+
+feature: 支持配置文件修改自动刷新
+
 1.4.10
 
 feature: 资源对应多个配置文件情况下，出警告信息

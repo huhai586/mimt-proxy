@@ -1,6 +1,6 @@
 {
   "name": "b-proxy-cli",
-  "version": "1.4.10",
+  "version": "1.4.13",
   "description": "一个bs承载页资源请求转发工具,支持http 与https",
   "main": "index.js",
   "dependencies": {

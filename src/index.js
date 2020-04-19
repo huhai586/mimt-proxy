@@ -6,7 +6,7 @@ const wsAbout = require("./selectConfig")
 const program = require('commander');
 
 program
-  .version('1.0.21', '-v, --version')
+  .version('1.4.13', '-v, --version')
   .option('-p, --port [value]', '代理服务器运行的端口，默认6789', 6789)
   .option('--proxyedHostname [value]', '只对只对指定hostname的资源进行本地请求,默认stnew03.beisen.com', "stnew03.beisen.com")
   .option('--localServerHostName [value]', '服务资源提供者，默认http://localhost:3000', 'http://localhost:3000')
@@ -20,9 +20,11 @@ if(program.config === undefined) {
   //如果没有相应的配置文件，那么运行友好页面提示用户选择配置
   //启动后台服务+启动网页
   wsAbout.initWsAndHttpServer(program.port);
+  initProxyServer()
   
 } else {
-  initProxyServer(program)
+  console.log("目前不支持命令行方式启动")
+  // initProxyServer(program)
 }
 
 

@@ -8,18 +8,19 @@
  *
  * **/
 module.exports={
+  description:"p-approvalcentre",
   excludePattern: [
     'iTalentSDKServer-0.1.9-107',
     'favicon.ico',
     'react-16.8.6-5.productio'
   ],
-  includePattern: ['beisen-chat-robot'],
-  localServerHostName: 'http://localhost:3000',
+  includePattern: ['p-approvalcentre'],
+  localServerHostName: 'http://localhost:8888',
   
-  proxyedHostname: 'stnew03.beisen.com',
+  proxyedHostname: 'stnew02.beisen.com',
   customProxyRules: [
     {
-      pathRewriteRule: "main-2.0.8.min main.chunk",
+      pathRewriteRule: "app-(.*).js bundle.js"
       // byPass: 'http://10.99.28.143:3001'
     }
   ]

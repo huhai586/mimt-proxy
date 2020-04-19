@@ -5,7 +5,7 @@ const os = require('os');
 const actions = require("../consts");
 const {getIP} = require("../common/utils");
 const {configsManage} = require("../initialProxyServer/utils");
-const {initProxyServer, getProxyServer} = require("../initialProxyServer");
+const {selectConfig, getProxyServer} = require("../initialProxyServer");
 const NpmApi= require('npm-api');
 const open = require('open');
 
@@ -14,7 +14,8 @@ const express = require('express');
 
 const wsAbout = {
   getAllConfigFilesInfo: function() {
-    const allFiels = fs.readdirSync(path.join(__dirname,'../configs'), 'utf8');
+    let allFiels = fs.readdirSync(path.join(__dirname,'../configs'), 'utf8');
+    allFiels = allFiels.filter((v) => { return /\.js$/.test(v)});
     const allFielsInfo = [];
     
     allFiels.forEach((fileName) => {
@@ -33,7 +34,7 @@ const wsAbout = {
     if (proxyServer) {
       // proxyServer.close && proxyServer.close()
     }
-    initProxyServer({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData),this.selectPort)
+    selectConfig({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData),this.selectPort)
     
   },
   createFile: () => {

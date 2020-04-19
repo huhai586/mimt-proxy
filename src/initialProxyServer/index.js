@@ -1,41 +1,23 @@
 
 const http = require('http');
-const {createOptionsForLocalRequest, createOptionFromCli,getProxyRule,configsManage} = require('./utils');
+const {createOptionFromCli,getProxyRule,configsManage} = require('./utils');
+const {extractIPFromAdrInfo}= require("../common/utils");
+const {accessDeveiceManage} = require("../common/helper");
 const ProxyForHttp = require("./proxy-for-http");
 const ProxyForHttps = require("./proxy-for-https");
 
 let httpMitmProxy;
 
-
-const getMatchConfigForCurRequest = () => {
-
-}
-const init = (configObject, startUpCallBack, port) => {
+const selectConfig = (configObject, selectConfigCallBack, port) => {
   const initOptions = createOptionFromCli(configObject);
-  // let {
-  //   localServerHostName,
-  //   port,
-  //   proxyedHostname,
-  //   excludePattern,
-  //   customProxyRules,
-  //   includePattern
-  // } = initOptions;
-  
   //存储当前配置
   configsManage.update({
     configName:configObject.configName,
     configData: initOptions
   });
-  
-  //初始化localRequest options
-  // createOptionsForLocalRequest.init(localServerHostName,configObject.configName);
-  
-  if (!!httpMitmProxy === true) {
-    startUpCallBack({startSuc: true, msg:`新配置文件${configObject.configName}已经生效`});
-    return
-  };
-  startProxyServer(startUpCallBack, port);
+  selectConfigCallBack({startSuc: true, msg:`新配置文件${configObject.configName}已经生效`});
 }
+
 const shutDownServer = (callback) => {
   httpMitmProxy.close && httpMitmProxy.close(callback);
 }
@@ -45,10 +27,17 @@ const getProxyServer = () => {
 }
 
 const startProxyServer = (startUpCallBack, port = 6789) => {
+  if(httpMitmProxy) {
+    console.log("已经启动过http-server无需再启动");
+    return;
+  }
   httpMitmProxy = new http.Server();
 
 // 代理http请求
   httpMitmProxy.on('request', (req, res) => {
+    const ip =extractIPFromAdrInfo(req.socket.remoteAddress);
+    (ip !== '::1') && accessDeveiceManage.add(ip)
+    
     ProxyForHttp(req,res,getProxyRule(req.url));
     res.on('error', () => {
       console.log('😩响应异常中断')
@@ -58,7 +47,10 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
 // 代理https请求
 // https的请求通过http隧道方式转发
   httpMitmProxy.on('connect', (req, cltSocket, head) => {
+    const ip =extractIPFromAdrInfo(cltSocket.remoteAddress);
+    (ip !== '::1') && accessDeveiceManage.add(ip)
     ProxyForHttps(req,cltSocket, head);
+    
     cltSocket.on('error', () => {
       console.log('😩响应异常中断');
     })
@@ -81,7 +73,8 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
   });
 }
 module.exports = {
-  initProxyServer: init,
+  initProxyServer: startProxyServer,
+  selectConfig: selectConfig,
   shutDownServer,
   getProxyServer
 }

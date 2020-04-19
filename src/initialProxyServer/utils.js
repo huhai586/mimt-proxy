@@ -410,17 +410,29 @@ const getUrlFromOptions = (options) => {
   return options.protocol + options.hostname + ":" +options.port + options.path;
 }
 
-const add = path.join(__dirname, '../images/horrible.png');
+const horrible = path.join(__dirname, '../images/horrible.png');
 const thinking = path.join(__dirname, '../images/thinking.png');
 
 const showMessage = {
+  info: (e) => {
+    notifier.notify(
+      {
+        title: e.title || '',
+        subtitle: e.subtitle,
+        message: e.message,
+        icon: horrible, // Absolute path (doesn't work on balloons)
+        sound: true, // Only Notification Center or Windows Toasters
+        wait: true // Wait with callback, until user action is taken against notification,
+      }
+    );
+  },
   error: (e) => {
     notifier.notify(
       {
         title: '请求出错了!',
         subtitle: e.subtitle,
         message: e.message,
-        icon: add, // Absolute path (doesn't work on balloons)
+        icon: horrible, // Absolute path (doesn't work on balloons)
         sound: true, // Only Notification Center or Windows Toasters
         wait: false // Wait with callback, until user action is taken against notification,
       }
