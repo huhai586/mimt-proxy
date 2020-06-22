@@ -38,6 +38,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
     
   } else {
     // 对非stnew03.beisen.com的内容直接转发
+    console.log(srvUrl.hostname,"无需代理，直接请求原来的地址")
     let srvSocket = net.connect(srvUrl.port, srvUrl.hostname, () => {
       cltSocket.write('HTTP/1.1 200 Connection Established\r\n' +
         'Proxy-agent: MITM-proxy\r\n' +

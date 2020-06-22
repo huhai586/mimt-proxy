@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const {extractAsset, getFileName, splitFileNameInPieces, matchResource} = require('./utils');
 const {requestRealTarget, showMessage} = require("./utils");
 const getBody = (response) => {
@@ -17,7 +18,9 @@ const getBody = (response) => {
 
 
 const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
-  let reWDV = http.request(optionsForLocalRequest,  async (WPDresponse) =>{
+  const protocolType = optionsForLocalRequest['protocol'];
+  const requestType = protocolType === 'http' ? http : https;
+  let reWDV = requestType.request(optionsForLocalRequest,  async (WPDresponse) =>{
     let body = await getBody(WPDresponse);
     
     // 解析body

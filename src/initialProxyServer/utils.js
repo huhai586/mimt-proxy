@@ -220,6 +220,7 @@ const setHeader = (realRes, res) => {
 
 const requestRealTarget =  (options,req, res, isHttp = true) => {
   // 根据客户端请求，向真正的目标服务器发起请求。
+  console.log("最终的url", req.url)
   let chunkCount = 0;
   let httpMethod = isHttp ? http : https;
   
@@ -407,7 +408,7 @@ const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules =
 }
 
 const getUrlFromOptions = (options) => {
-  return options.protocol + options.hostname + ":" +options.port + options.path;
+  return options.protocol +"//" + options.hostname + ":" +options.port + options.path;
 }
 
 const horrible = path.join(__dirname, '../images/horrible.png');

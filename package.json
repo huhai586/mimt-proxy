@@ -1,6 +1,6 @@
 {
   "name": "b-proxy-cli",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "description": "一个bs承载页资源请求转发工具,支持http 与https",
   "main": "index.js",
   "dependencies": {
@@ -10,6 +10,7 @@
     "node-forge": "^0.6.49",
     "node-notifier": "^5.4.1",
     "npm-api": "^1.0.0",
+    "nusion-cmp-list": "^1.0.26",
     "open": "^7.0.0",
     "through2": "^2.0.1",
     "ws": "^7.2.0"

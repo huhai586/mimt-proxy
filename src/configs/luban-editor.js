@@ -7,14 +7,17 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
+
+// DEMO
+// https://stnew03.beisen.com/ux/setting-cloud-italent/release/app/scripts/views/application/index-page-view-1910231746.min.js
+// http://localhost:8000/scripts/views/application/index-page-view.js
 module.exports={
-  description:'流程设置',
-  excludePattern: ['webpack-bootstrap', 'vendors','BeisenCloudUI','ethos'],
-  includePattern: ['p-beisencloud-setting'],
-  localServerHostName: 'https://localhost:3001',
+  description:'鲁班ux-nusion-editor',
+  excludePattern: ['monaco'],
+  includePattern: ['ux-nusion-editor'],
+  localServerHostName: 'http://localhost:3000',
+  
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
-
-  
   ]
 }
