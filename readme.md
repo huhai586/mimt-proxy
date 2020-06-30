@@ -158,6 +158,11 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.4.16
+
+feature: 支持代理资源到本地https服务器（支持自签名证书）
+
+
 1.4.14
 
 doc: 新增移动端配置文件
