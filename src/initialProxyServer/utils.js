@@ -220,7 +220,7 @@ const setHeader = (realRes, res) => {
 
 const requestRealTarget =  (options,req, res, isHttp = true) => {
   // 根据客户端请求，向真正的目标服务器发起请求。
-  console.log("最终的url", req.url)
+  console.log("最终的url", `${options.protocol}//${options.hostname}:${options.port}${options.path}`)
   let chunkCount = 0;
   let httpMethod = isHttp ? http : https;
   

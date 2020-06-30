@@ -1,6 +1,6 @@
 {
   "name": "b-proxy-cli",
-  "version": "1.4.14",
+  "version": "1.4.15",
   "description": "一个bs承载页资源请求转发工具,支持http 与https",
   "main": "index.js",
   "dependencies": {
@@ -16,16 +16,19 @@
     "ws": "^7.2.0"
   },
   "bin": "./src/index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "cross-env": "^7.0.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "set NODE_TLS_REJECT_UNAUTHORIZED='0' && b-proxy-cli"
+
   },
   "keywords": [
     "proxy"
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/haha586/https-mimt"
+    "url": "https://github.com/huhai586/mimt-proxy"
   },
   "author": "huhai",
   "license": "ISC"

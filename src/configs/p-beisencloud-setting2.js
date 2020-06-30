@@ -8,10 +8,10 @@
  *
  * **/
 module.exports={
-  description:'流程设置',
+  description:'流程设置-https版本',
   excludePattern: ['webpack-bootstrap', 'vendors','BeisenCloudUI','ethos'],
   includePattern: ['p-beisencloud-setting'],
-  localServerHostName: 'http://localhost:3001',
+  localServerHostName: 'https://localhost:3001',
   proxyedHostname: 'stnew03.beisen.com',
   customProxyRules: [
 

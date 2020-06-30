@@ -256,9 +256,7 @@ bugsfix：customProxyRules 会修改所有代理的url
 支持用户自定义path重写规则，支持js 正则表达式所有语法
 
 ###作者
-使用本软件若有需求或者帮助，请mail
-
-huhai#gmail.com
+使用本软件若有需求或者帮助，请提issues
 
   
 

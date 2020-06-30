@@ -19,7 +19,7 @@ const getBody = (response) => {
 
 const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
   const protocolType = optionsForLocalRequest['protocol'];
-  const requestType = protocolType === 'http' ? http : https;
+  const requestType = protocolType === 'http:' ? http : https;
   let reWDV = requestType.request(optionsForLocalRequest,  async (WPDresponse) =>{
     let body = await getBody(WPDresponse);
     
@@ -43,9 +43,8 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
       console.log('已经查找到本地匹配');
       console.log('请求地址', req.url);
       console.log('本地匹配地址',matchResourceResult);
-      console.log('本地请求参数为:' );
-      console.log(byPassRequestOptions);
-      requestRealTarget(byPassRequestOptions, req, res);
+      console.log('本地请求参数为:',JSON.stringify(byPassRequestOptions) );
+      requestRealTarget(byPassRequestOptions, req, res, byPassRequestOptions.protocol === 'http:');
     } else {
       console.log("😢未能在本地找到匹配文件,", fileNameWithType,'将返回404');
       res.writeHead(404, {'Content-Type': 'text/plain'})
@@ -54,10 +53,19 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
   });
   reWDV.end();
   reWDV.on('error', (e) => {
+    const localUrl = `${optionsForLocalRequest.protocol}//${optionsForLocalRequest.hostname}:${optionsForLocalRequest.port}${optionsForLocalRequest.path}`;
+    
     console.error(e);
     if (e.code === 'ECONNREFUSED') {
       e.subtitle = "本地webpack server 没有启动？";
     }
+    if (e.code === 'EPROTO') {
+      e.subtitle = `无法访问？`;
+    }
+    res.writeHead(404, {'Content-Type': 'text/html'})
+    res.end(`<div style="padding: 1em; color: red"> 无法访问地址, 请检查配置! <br/> ${localUrl} <div>
+错误详情： ${e}
+</div></div> `)
     showMessage.error(e);
   })
 };
