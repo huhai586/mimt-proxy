@@ -22,11 +22,7 @@ const wsAbout = {
       const filePath = `${path.join(__dirname,'../configs')}/${fileName}`;
       delete require.cache[filePath];
       const fileData = require(filePath);
-   
-      fs.readFile(filePath, {encoding: 'utf-8'},(err, data) => {
-        if (err) throw err;
-        console.log(data);
-      });
+      
       allFielsInfo.push({
         fileName,
         fileData
