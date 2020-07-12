@@ -8,14 +8,13 @@
  *
  * **/
  module.exports = {
-    "description": "BeisenCloudUI",
+    "description": "移动端BeisenCloudMobile",
     "excludePattern": [],
     "includePattern": [
-        "BeisenCloudUI"
+        "BeisenCloudMobile"
     ],
     "localServerHostName": "http://localhost:9090",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable111": false,
     "enable": false
 }

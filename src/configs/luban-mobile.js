@@ -8,14 +8,15 @@
  *
  * **/
  module.exports = {
-    "description": "BeisenCloudUI",
+    "category": "鲁班",
+    "version": "1.0.0",
+    "description": "M鲁班测试",
     "excludePattern": [],
     "includePattern": [
-        "BeisenCloudUI"
+        "lu-mobile-test"
     ],
-    "localServerHostName": "http://localhost:9090",
+    "localServerHostName": "http://localhost:3001",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable111": false,
     "enable": false
 }

@@ -7,14 +7,18 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
-module.exports={
-  description:'消息模板',
-  excludePattern: [],
-  includePattern: ['message-platform'],
-  localServerHostName: 'http://localhost:3000',
-  
-  proxyedHostname: 'xfile5.tita.com',
-  customProxyRules: [
-    {pathRewriteRule:"ethos(.*).bundle.min.js ethos.js"}
-]
+ module.exports = {
+    "description": "消息模板",
+    "excludePattern": [],
+    "includePattern": [
+        "message-platform"
+    ],
+    "localServerHostName": "http://localhost:3000",
+    "proxyedHostname": "xfile5.tita.com",
+    "customProxyRules": [
+        {
+            "pathRewriteRule": "ethos(.*).bundle.min.js ethos.js"
+        }
+    ],
+    "enable": false
 }

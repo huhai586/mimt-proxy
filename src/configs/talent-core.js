@@ -7,14 +7,14 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
-module.exports={
-  description:'Talent-core',
-  excludePattern: [],
-  includePattern: ['talent-libs'],
-  localServerHostName: 'http://localhost:8080',
-  
-  proxyedHostname: 'stnew03.beisen.com',
-  customProxyRules: [
-    // {pathRewriteRule:"talent-libs-1.0.30.min.js talent-libs-1.0.74.min.js"}
-  ]
+ module.exports = {
+    "description": "Talent-core",
+    "excludePattern": [],
+    "includePattern": [
+        "talent-libs"
+    ],
+    "localServerHostName": "http://localhost:8080",
+    "proxyedHostname": "stnew03.beisen.com",
+    "customProxyRules": [],
+    "enable": false
 }

@@ -3,6 +3,7 @@ const http = require('http');
 const url = require('url');
 const https = require('https');
 const notifier = require('node-notifier');
+const fs = require('fs');
 
 
 const extractAsset = (str = '') => {
@@ -489,6 +490,16 @@ const configsManage = (function(){
       delete allConfigs[fileName];
       callback && callback();
     },
+    banConfig: async function(fileName){
+      //先禁用
+      this.deleteConfig(fileName);
+      //写入文件做持久化
+      await paramModifyForConfig(fileName, {enable: false});
+    },
+    turnOnConfig: async function(fileName){
+      //写入文件做持久化
+      await paramModifyForConfig(fileName, {enable: true});
+    },
     getAllConfigs: function(){
       const temArr = [];
       for(let p in allConfigs) {
@@ -540,6 +551,39 @@ const getProxyRule = function(urlString){
     return configMatched[0].fileData
   }
 };
+
+
+
+const paramModifyForConfig =  (fileName, data) => {
+  
+  return new Promise((resolve, reject) => {
+    const configFileAddress = path.join(__dirname,`../configs/${fileName}`);
+    let configValue = require(configFileAddress);
+    configValue = {...configValue, ...data};
+    const strPrend = `/**
+ * @excludePattern regexp|string[] hostname下 请求资源url path中如果匹配这个字段，这个资源不会被代理到本地，直接访问原始资源
+ * @includePattern regexp|string[] hostname下 请求资源url path必须include 相应字段才能被代理到本地
+ * @localServerHostName string 本地资源服务器hostname
+ 
+ * @proxyedHostname string 只对只对指定hostname的资源进行本地请求
+ * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
+ *
+ * **/
+ `
+    const v = `module.exports = ${JSON.stringify(configValue, null, 4)}`;
+    // fs.w
+    fs.writeFile(configFileAddress, strPrend + v, function (err) {
+      if (err) {
+        console.log('There has been an error saving your configuration data.');
+        console.log(err.message);
+        reject("failure")
+        return;
+      }
+      resolve("ok")
+      console.log('Configuration saved successfully.')
+    });
+  })
+}
 exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;

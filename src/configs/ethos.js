@@ -7,14 +7,18 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
-module.exports={
-  description:'ethos',
-  excludePattern: [],
-  includePattern: ['ethos'],
-  localServerHostName: 'http://localhost:3002',
-  
-  proxyedHostname: 'stnew03.beisen.com',
-  customProxyRules: [
-    {pathRewriteRule:"ethos(.*).bundle.min.js ethos.js"}
-]
+ module.exports = {
+    "description": "ethos",
+    "excludePattern": [],
+    "includePattern": [
+        "ethos"
+    ],
+    "localServerHostName": "http://localhost:3002",
+    "proxyedHostname": "stnew03.beisen.com",
+    "customProxyRules": [
+        {
+            "pathRewriteRule": "ethos(.*).bundle.min.js ethos.js"
+        }
+    ],
+    "enable": false
 }

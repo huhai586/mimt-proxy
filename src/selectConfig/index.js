@@ -19,7 +19,14 @@ const wsAbout = {
     const allFielsInfo = [];
     
     allFiels.forEach((fileName) => {
-      const fileData = require(`${path.join(__dirname,'../configs')}/${fileName}`);
+      const filePath = `${path.join(__dirname,'../configs')}/${fileName}`;
+      delete require.cache[filePath];
+      const fileData = require(filePath);
+   
+      fs.readFile(filePath, {encoding: 'utf-8'},(err, data) => {
+        if (err) throw err;
+        console.log(data);
+      });
       allFielsInfo.push({
         fileName,
         fileData
@@ -157,6 +164,20 @@ const wsAbout = {
     const params = {action: actions.GET_CURRENT_CONFIG, payload: this.getCurrentConfig()};
     this.sendMessage(params);
   },
+  banConfig: async function(configData) {
+    const {fileName} = configData;
+    await configsManage.banConfig(fileName);
+    const params = {action: actions.GET_CURRENT_CONFIG, payload: this.getCurrentConfig()};
+    this.sendMessage(params);
+    return configData
+  },
+  turnOnConfig: async function(configData) {
+    const {fileName} = configData;
+    await configsManage.turnOnConfig(fileName);
+    const params = {action: actions.GET_CURRENT_CONFIG, payload: this.getCurrentConfig()};
+    this.sendMessage(params);
+    return configData
+  },
   getMatchInfoFromAction: function(msgJson) {
     switch (msgJson.action) {
       case actions.FETCH_ALL_CONFIGS:
@@ -175,6 +196,12 @@ const wsAbout = {
         break;
       case actions.STOP_CONFIG:
         return this.stopConfig(msgJson.payload);
+        break;
+      case actions.BAN_CONFIG:
+        return this.banConfig(msgJson.payload);
+        break;
+      case actions.TURN_ON_CONFIG:
+        return this.turnOnConfig(msgJson.payload);
         break;
       default :
         console.log("未找到对应数据",msgJson.action);
@@ -196,15 +223,27 @@ const wsAbout = {
           return;
         }
         const info = this.getMatchInfoFromAction(msg);
-        if (info === undefined) {
-          // console.log("当前msg无返回值", msg);
-          return;
-        }
-        const params = {action: msg.action, payload: info};
-        this.sendMessage(params);
+        this.handleInfo(info,msg)
       });
       
     });
+  },
+  handleInfo : function(info,msg) {
+    if (info === undefined) {
+      // console.log("当前msg无返回值", msg);
+      return;
+    }
+    if (info instanceof Promise) {
+      info.then(v =>{
+        const params = {action: msg.action, payload: v};
+        this.sendMessage(params);
+      })
+    } else {
+      const params = {action: msg.action, payload: info};
+      this.sendMessage(params);
+    }
+    
+
   },
   initWsAndHttpServer: function(port = 6789){
     // 设置唯一端口
