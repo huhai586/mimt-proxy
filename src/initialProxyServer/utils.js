@@ -4,6 +4,7 @@ const url = require('url');
 const https = require('https');
 const notifier = require('node-notifier');
 const fs = require('fs');
+const md5File = require('md5-file');
 
 
 const extractAsset = (str = '') => {
@@ -316,24 +317,28 @@ const createOptionsForLocalRequest = (localServerHostName) => {
   
 }
 
-
-const createOptionFromCli = (configObject) => {
-  const program = configObject;
+const getFileAddrByName = (fileName) => path.join(__dirname,`../configs/${fileName}`);
+const getFileHashByNameAsync = (fileName) => {
+  const fileAddr = getFileAddrByName(fileName);
+  return md5File(fileAddr)
+}
+const createOptionFromCli = (configName) => {
   let configValue = {}
-  const configName = program.configName;
-  const currentDirection = process.cwd();
+  let fileAddr = getFileAddrByName(configName);
   if (configName) {
-    const configFileAddress = path.join(__dirname,`../configs/${configName}`);
-    configValue = require(configFileAddress);
+    configValue = require(fileAddr);
+  } else {
+    throw Error(`配置文件名为空`)
   }
-  
+  const md5 = md5File.sync(fileAddr);
   let options = {
-    localServerHostName:  configValue.localServerHostName || program.localServerHostName,
+    localServerHostName:  configValue.localServerHostName,
     // port: configValue.port || program.port,
-    proxyedHostname:  configValue.proxyedHostname || program.proxyedHostname,
+    proxyedHostname:  configValue.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
     includePattern: configValue.includePattern,
-    customProxyRules: configValue.customProxyRules
+    customProxyRules: configValue.customProxyRules,
+    fileHash: md5
   }
   return options;
 }
@@ -506,10 +511,50 @@ const configsManage = (function(){
         temArr.push({fileName: p, fileData: allConfigs[p]});
       }
       return temArr;
-    }
+    },
+    configChangeMonitor: function(){
+      //每隔6s，做一次配置文件hash检查，如果遇到hash变化，主动覆盖内存中的同名配置文件
+      setTimeout(async () =>{
+        await hashLoopsCheck.fileHashVerify(allConfigs, this.update.bind(this));
+        this.configChangeMonitor();
+      }, 6000)
+    },
+    
   }
 })();
 
+
+const hashLoopsCheck = {
+  fileHashVerify: async function(allConfigs, updateConfig) {
+    for(let p in allConfigs) {
+      const fileName = p;
+      const fileData = allConfigs[p];
+      const {fileHash = ''} = fileData;
+      if (fileHash === '') {
+        continue;
+      } else {
+        // console.log("")
+         const hashReal = await getFileHashByNameAsync(fileName);
+         this.compareHash(hashReal, fileHash,fileName,updateConfig)
+      }
+    }
+  },
+  compareHash: function(newHash, memoryHash,fileName,updateConfig){
+    const isSame = isStringSame(newHash, memoryHash);
+    if (isSame === false) {
+      this.updateConfig(fileName,updateConfig)
+    }
+  },
+  updateConfig: function(fileName,updateConfig) {
+    //读取fileName对应的config
+    const configData = createOptionFromCli(fileName);
+    updateConfig({configName:fileName, configData});
+    console.log(`${fileName}文件发生变化，已主动更新`)
+  }
+}
+const isStringSame = (str1, str2) => {
+  return str1 === str2;
+}
 const isMatchHostName = (hostName = '') => {
   const allConfigs = configsManage.getAllConfigs();
   const configsInArray = Object.values(allConfigs);

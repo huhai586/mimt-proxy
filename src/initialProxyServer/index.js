@@ -9,7 +9,13 @@ const ProxyForHttps = require("./proxy-for-https");
 let httpMitmProxy;
 
 const selectConfig = (configObject, selectConfigCallBack, port) => {
-  const initOptions = createOptionFromCli(configObject);
+  let initOptions;
+   try {
+     initOptions = createOptionFromCli(configObject.configName);
+   } catch (e) {
+     selectConfigCallBack({startSuc: false, msg:`新配置文件${configObject.configName}无法被正常选择.${e}`});
+     return
+   }
   //存储当前配置
   configsManage.update({
     configName:configObject.configName,
@@ -59,7 +65,10 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
   httpMitmProxy.listen(port, function () {
     const msg = `💚HTTP/HTTPS中间人代理启动成功，端口：${port}`
     console.log(msg);
-    startUpCallBack && startUpCallBack({startSuc: true, msg})
+    startUpCallBack && startUpCallBack({startSuc: true, msg});
+    //配置文件变化监听& handle 。为了处理外部文件变更
+    configsManage.configChangeMonitor();
+  
   });
   
   httpMitmProxy.on('error', (e) => {

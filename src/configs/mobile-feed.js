@@ -8,17 +8,13 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班form field",
-    "excludePattern": [
-        "monaco"
-    ],
+    "description": "mobile-动态详情",
+    "excludePattern": [],
     "includePattern": [
-        "beisen-platform-nusion-field-"
+        "ux-italentapp-feed"
     ],
-    "localServerHostName": "http://localhost:3001",
+    "localServerHostName": "http://localhost:3000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }
