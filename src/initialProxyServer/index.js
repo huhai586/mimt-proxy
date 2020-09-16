@@ -41,6 +41,7 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
 
 // 代理http请求
   httpMitmProxy.on('request', (req, res) => {
+    console.log("接收到http代理请求",req.url);
     const ip =extractIPFromAdrInfo(req.socket.remoteAddress);
     (ip !== '::1') && accessDeveiceManage.add(ip)
     
@@ -53,6 +54,7 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
 // 代理https请求
 // https的请求通过http隧道方式转发
   httpMitmProxy.on('connect', (req, cltSocket, head) => {
+    console.log("接收到connect请求",req.url);
     const ip =extractIPFromAdrInfo(cltSocket.remoteAddress);
     (ip !== '::1') && accessDeveiceManage.add(ip)
     ProxyForHttps(req,cltSocket, head);

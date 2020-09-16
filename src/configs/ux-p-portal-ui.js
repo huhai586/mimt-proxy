@@ -8,17 +8,15 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班form field",
+    "description": "[拓展]数据权限",
     "excludePattern": [
-        "monaco"
+
     ],
     "includePattern": [
-        "beisen-platform-nusion-field-"
+        "ux-p-portal-ui"
     ],
-    "localServerHostName": "http://localhost:3001",
-    "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:3000",
+    "proxyedHostname": "stnew02.beisen.com",
     "customProxyRules": [],
-    "enable": false
+    "enable": true
 }

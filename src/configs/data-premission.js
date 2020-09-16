@@ -8,17 +8,15 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班form field",
+    "description": "thunderPage-数据权限",
     "excludePattern": [
-        "monaco"
+
     ],
     "includePattern": [
-        "beisen-platform-nusion-field-"
+        "ux-platform-data-permission"
     ],
     "localServerHostName": "http://localhost:3001",
-    "proxyedHostname": "stnew03.beisen.com",
+    "proxyedHostname": "stnew.beisen.com",
     "customProxyRules": [],
-    "enable": false
+    "enable": true
 }

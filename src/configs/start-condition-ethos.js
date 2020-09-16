@@ -8,17 +8,18 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班form field",
-    "excludePattern": [
-        "monaco"
-    ],
+    "description": "发起条件ethos 0。5。99",
+    "excludePattern": [],
     "includePattern": [
-        "beisen-platform-nusion-field-"
+        "ethos",
+        "p-start-condition"
     ],
-    "localServerHostName": "http://localhost:3001",
+    "localServerHostName": "http://localhost:8080",
     "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
+    "customProxyRules": [
+        {
+            "pathRewriteRule": "ethos(.*).bundle.min.js ethos-a4bcd79fd6aced652dbb.bundle.min.js"
+        }
+    ],
     "enable": false
 }

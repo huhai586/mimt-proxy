@@ -20,5 +20,5 @@
             "pathRewriteRule": "ethos(.*).bundle.min.js ethos.js"
         }
     ],
-    "enable": false
+    "enable": true
 }

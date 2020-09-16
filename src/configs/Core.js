@@ -8,7 +8,7 @@
  *
  * **/
  module.exports = {
-    "sichuan": "uuu",
+    "sichuan": "uuu12",
     "description": "Core",
     "excludePattern": [
         "BeisenCloudUI",
