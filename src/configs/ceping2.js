@@ -8,17 +8,17 @@
  *
  * **/
  module.exports = {
-    "description": "ethos",
-    "excludePattern": [],
+    "description": "测评-摄像头检测页面",
+    "excludePattern": ['es6','jquery','i18n'],
     "includePattern": [
-        "ethos"
+        "scripts"
     ],
-    "localServerHostName": "http://localhost:3002",
-    "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:9000",
+    "proxyedHostname": "assistant.ceping.com",
     "customProxyRules": [
-        {
-            "pathRewriteRule": "ethos(.*).bundle.min.js ethos.js"
-        }
+      {
+        "pathRewriteRule": "carmeDetect.js app.js"
+      }
     ],
-    "enable": false
+    "enable": true
 }

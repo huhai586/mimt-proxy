@@ -8,17 +8,23 @@
  *
  * **/
  module.exports = {
-    "description": "ethos",
-    "excludePattern": [],
+    "description": "测评",
+    "excludePattern": ['i18n'],
     "includePattern": [
-        "ethos"
+        "tools-assessment"
     ],
-    "localServerHostName": "http://localhost:3002",
-    "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:3001",
+    "proxyedHostname": "stcglobal.beisen.com",
     "customProxyRules": [
         {
-            "pathRewriteRule": "ethos(.*).bundle.min.js ethos.js"
+            "pathRewriteRule": "/ux/tools-assessment/(.*)",
+            "pathReplaceFunc": (str) => {
+              let removeNum =  str.replace(/(-[\d]+)\.min/g, '');
+              removeNum = removeNum.replace('ux/tools-assessment/release/','')
+              return removeNum
+            },
+            "byPass": "http://127.0.0.1:8080"
         }
     ],
-    "enable": false
+    "enable": true
 }

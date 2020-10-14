@@ -62,7 +62,7 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
     if (e.code === 'EPROTO') {
       e.subtitle = `无法访问？`;
     }
-    res.writeHead(404, {'Content-Type': 'text/html'})
+    res.writeHead(404, {'Content-Type': 'text/html;charset=utf-8'})
     res.end(`<div style="padding: 1em; color: red"> 无法访问地址, 请检查配置! <br/> ${localUrl} <div>
 错误详情： ${e}
 </div></div> `)

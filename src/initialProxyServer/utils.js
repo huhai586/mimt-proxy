@@ -34,7 +34,7 @@ const getFileName = (str) => {
 
 const splitFileNameInPieces = (str) => {
   // todo 文件名的组成成分可能有非- .
-  return str.replace(/-/g, '.').split(".");
+  return str.replace(/\?(.*)$/, '').replace(/-/g, '.').split(".");
 };
 
 const matchFileType = (arr, fileType) => {

@@ -158,6 +158,12 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+1.4.21
+
+bugfix: 报错提示乱码
+
+bugfix: url中有查询字符的时候匹配出错
+
 1.4.20
 
 bugfix: 获取网络ip逻辑错误
