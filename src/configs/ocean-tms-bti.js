@@ -8,15 +8,18 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班ux-nusion-runtime",
+    "description": "[Ocean]-tms-bti",
     "excludePattern": [],
     "includePattern": [
-        "ux-nusion-runtime"
+        "tms-bti/release/app"
     ],
-    "localServerHostName": "http://localhost:5002",
-    "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
+    "localServerHostName": "http://localhost:8002",
+    "proxyedHostname": "cdn.bstatics.com",
+    "customProxyRules": [
+        {
+            "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
+            "byPass": "http://localhost:8002"
+        }
+    ],
     "enable": false
 }

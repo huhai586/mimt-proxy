@@ -9,14 +9,12 @@
  * **/
  module.exports = {
     "description": "[拓展]数据权限",
-    "excludePattern": [
-
-    ],
+    "excludePattern": [],
     "includePattern": [
         "ux-p-portal-ui"
     ],
     "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew02.beisen.com",
+    "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": true
 }

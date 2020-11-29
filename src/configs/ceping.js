@@ -9,7 +9,9 @@
  * **/
  module.exports = {
     "description": "测评",
-    "excludePattern": ['i18n'],
+    "excludePattern": [
+        "i18n"
+    ],
     "includePattern": [
         "tools-assessment"
     ],
@@ -18,13 +20,8 @@
     "customProxyRules": [
         {
             "pathRewriteRule": "/ux/tools-assessment/(.*)",
-            "pathReplaceFunc": (str) => {
-              let removeNum =  str.replace(/(-[\d]+)\.min/g, '');
-              removeNum = removeNum.replace('ux/tools-assessment/release/','')
-              return removeNum
-            },
             "byPass": "http://127.0.0.1:8080"
         }
     ],
-    "enable": true
+    "enable": false
 }

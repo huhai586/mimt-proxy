@@ -9,16 +9,20 @@
  * **/
  module.exports = {
     "description": "测评-摄像头检测页面",
-    "excludePattern": ['es6','jquery','i18n'],
+    "excludePattern": [
+        "es6",
+        "jquery",
+        "i18n"
+    ],
     "includePattern": [
         "scripts"
     ],
     "localServerHostName": "http://localhost:9000",
     "proxyedHostname": "assistant.ceping.com",
     "customProxyRules": [
-      {
-        "pathRewriteRule": "carmeDetect.js app.js"
-      }
+        {
+            "pathRewriteRule": "carmeDetect.js app.js"
+        }
     ],
-    "enable": true
+    "enable": false
 }

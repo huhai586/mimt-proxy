@@ -8,14 +8,12 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班ux-nusion-runtime",
+    "description": "身份管理",
     "excludePattern": [],
     "includePattern": [
-        "ux-nusion-runtime"
+        "ux-p-platfrom-charge"
     ],
-    "localServerHostName": "http://localhost:5002",
+    "localServerHostName": "http://localhost:3000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": false

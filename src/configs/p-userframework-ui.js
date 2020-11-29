@@ -14,7 +14,7 @@
         "p-userframework-ui"
     ],
     "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew02.beisen.com",
+    "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": true
 }

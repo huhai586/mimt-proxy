@@ -9,14 +9,12 @@
  * **/
  module.exports = {
     "description": "thunderPage-数据权限",
-    "excludePattern": [
-
-    ],
+    "excludePattern": [],
     "includePattern": [
         "ux-platform-data-permission"
     ],
     "localServerHostName": "http://localhost:3001",
     "proxyedHostname": "stnew.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

@@ -8,14 +8,12 @@
  *
  * **/
  module.exports = {
-    "category": "鲁班",
-    "version": "1.0.0",
-    "description": "鲁班ux-nusion-runtime",
+    "description": "鲁班searchForm 标准组件",
     "excludePattern": [],
     "includePattern": [
-        "ux-nusion-runtime"
+        "beisen-platform-nusion-standard-search"
     ],
-    "localServerHostName": "http://localhost:5002",
+    "localServerHostName": "http://localhost:3001",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": false
