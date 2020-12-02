@@ -16,5 +16,5 @@
     "localServerHostName": "http://localhost:3000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

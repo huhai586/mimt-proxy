@@ -14,12 +14,16 @@
         "tms-bti/release/app"
     ],
     "localServerHostName": "http://localhost:8002",
-    "proxyedHostname": "cdn.bstatics.com",
+    "proxyedHostname": "stnew.beisen.com",
     "customProxyRules": [
         {
             "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
+            "pathReplaceFunc": function (originParam) {
+                const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
+                return replaceExtraStr
+            },
             "byPass": "http://localhost:8002"
         }
     ],
-    "enable": false
+    "enable": true
 }
