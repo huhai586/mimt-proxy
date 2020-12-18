@@ -8,13 +8,13 @@
  *
  * **/
  module.exports = {
-    "description": "[拓展]数据权限",
-    "excludePattern": [],
+    "description": "Ocean-DEV",
+    "excludePattern": ['images'],
     "includePattern": [
-        "ux-p-portal-ui"
+        "ocean-dev"
     ],
-    "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew.beisen.com",
+    "localServerHostName": "http://localhost:3003",
+    "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [],
-    "enable": false
+    "enable": true
 }

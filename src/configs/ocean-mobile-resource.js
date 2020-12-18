@@ -8,13 +8,13 @@
  *
  * **/
  module.exports = {
-    "description": "[拓展]数据权限",
+    "description": "Ocean-Mobile-资源",
     "excludePattern": [],
     "includePattern": [
-        "ux-p-portal-ui"
+        "images"
     ],
-    "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew.beisen.com",
+    "localServerHostName": "https://localhost:3000",
+    "proxyedHostname": "ocean.italent.link",
     "customProxyRules": [],
-    "enable": false
+    "enable": true
 }
