@@ -8,23 +8,14 @@
  *
  * **/
  module.exports = {
-    "description": "[Ocean]-tms-bti-backbone页面",
+    "description": "Ocean-资源-移动端",
     "excludePattern": [],
     "includePattern": [
-        "tms-bti/release/app"
+        "images"
     ],
-    "localServerHostName": "http://localhost:8002",
-    // "proxyedHostname": "stnew03.beisen.com",
-    "proxyedHostname": "tencentcdn.bstatics.com",
-    "customProxyRules": [
-        {
-            "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
-            "pathReplaceFunc": function (originParam) {
-                const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
-                return replaceExtraStr
-            },
-            "byPass": "http://localhost:8002"
-        }
-    ],
+    "localServerHostName": "https://localhost:3000",
+    // "proxyedHostname": "ocean.italent.link",
+   "proxyedHostname": "ocean.italent-inc.cn",
+   "customProxyRules": [],
     "enable": true
 }

@@ -9,11 +9,12 @@
  * **/
  module.exports = {
     "description": "Ocean-DEV",
-    "excludePattern": ['images'],
+    "excludePattern": ['images','talent-libs', 'ethos'],
     "includePattern": [
         "ocean-dev"
     ],
     "localServerHostName": "http://localhost:3003",
+    // "proxyedHostname": "stnew03.beisen.com",
     "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [],
     "enable": true

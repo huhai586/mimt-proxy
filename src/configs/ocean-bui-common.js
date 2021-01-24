@@ -7,24 +7,18 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
+
+
+// 使用此配置文件，运行的命令为bui-common 中的start 命令
  module.exports = {
-    "description": "[Ocean]-tms-bti-backbone页面",
-    "excludePattern": [],
+    "description": "BUI-Common",
+    "excludePattern": ['images', 'css'],
     "includePattern": [
-        "tms-bti/release/app"
+        "tms-bti",'release/dist'
     ],
-    "localServerHostName": "http://localhost:8002",
-    // "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:8003",
     "proxyedHostname": "tencentcdn.bstatics.com",
-    "customProxyRules": [
-        {
-            "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
-            "pathReplaceFunc": function (originParam) {
-                const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
-                return replaceExtraStr
-            },
-            "byPass": "http://localhost:8002"
-        }
-    ],
+    // "proxyedHostname": "stnew03.beisen.com",
+    "customProxyRules": [],
     "enable": true
 }

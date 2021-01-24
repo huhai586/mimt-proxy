@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const fs = require("fs");
 const {extractAsset, getFileName, splitFileNameInPieces, matchResource} = require('./utils');
 const {requestRealTarget, showMessage} = require("./utils");
 const getBody = (response) => {
@@ -47,8 +48,14 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
       requestRealTarget(byPassRequestOptions, req, res, byPassRequestOptions.protocol === 'http:');
     } else {
       console.log("😢未能在本地找到匹配文件,", fileNameWithType,'将返回404');
-      res.writeHead(404, {'Content-Type': 'text/plain'})
-      res.end();
+      res.writeHead(404, {'Content-Type': 'text/html'});
+
+      var path = require("path");
+
+      var url = path.resolve(__dirname, '../htmls/404.html');
+
+      const html = fs.readFileSync(url, 'utf-8');
+      res.end(html)
     }
   });
   reWDV.end();

@@ -14,7 +14,8 @@
         "images"
     ],
     "localServerHostName": "https://localhost:3000",
-    "proxyedHostname": "ocean.italent.link",
-    "customProxyRules": [],
+    // "proxyedHostname": "ocean.italent.link",
+   "proxyedHostname": "stnew03.beisen.com",
+   "customProxyRules": [],
     "enable": true
 }

@@ -8,22 +8,22 @@
  *
  * **/
  module.exports = {
-    "description": "[Ocean]-tms-bti-backbone页面",
+    "description": "[Ocean]-tms-setreport-backbone页面",
     "excludePattern": [],
     "includePattern": [
-        "tms-bti/release/app"
+        "tms-setreport/release/app"
     ],
     "localServerHostName": "http://localhost:8002",
     // "proxyedHostname": "stnew03.beisen.com",
     "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [
         {
-            "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
+            "pathRewriteRule": "/ux/tms-setreport/release/app(.*)",
             "pathReplaceFunc": function (originParam) {
-                const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
+                const replaceExtraStr= originParam.replace('/ux/tms-setreport/release','').replace(/-\d+\.min/,'')
                 return replaceExtraStr
             },
-            "byPass": "http://localhost:8002"
+            "byPass": "http://localhost:8000"
         }
     ],
     "enable": true
