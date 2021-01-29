@@ -180,8 +180,7 @@ const isPathMatchRule = (urlPath,excludeArray, includeArray) => {
   })
   return matchExclude && matchInclude
 }
-const isUrlNeedRequestLocal = (proxyedHostname, urlHostName,urlPath, excludeArray = [], includeArray = []) => {
-  if (proxyedHostname !== urlHostName) return false;
+const isUrlNeedRequestLocal = (urlHostName,urlPath, excludeArray = [], includeArray = []) => {
   return isPathMatchRule(urlPath,excludeArray, includeArray)
 }
 
@@ -574,8 +573,8 @@ const getProxyRule = function(urlString){
     const configMatched = configsInArray.filter((config) => {
       const urlHostName = urlObject.hostname;
       const urlPath = urlObject.path;
-      const {proxyedHostname, excludePattern:excludeArray, includePattern:includeArray} = config.fileData;
-      return isUrlNeedRequestLocal(proxyedHostname, urlHostName,urlPath, excludeArray, includeArray)
+      const {excludePattern:excludeArray, includePattern:includeArray} = config.fileData;
+      return isUrlNeedRequestLocal(urlHostName,urlPath, excludeArray, includeArray)
   });
   
   if (configMatched.length === 0) {

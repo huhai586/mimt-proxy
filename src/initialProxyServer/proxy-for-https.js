@@ -4,7 +4,7 @@ const {isMatchHostName} = require("./utils");
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 
 
-const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, includePattern, customProxyRules) => {
+const proxyForHttps = (req, cltSocket, head) => {
   // connect to an origin server
   let srvUrl = url.parse(`http://${req.url}`);
   console.log('-----------------------------------------------------------')
@@ -30,6 +30,7 @@ const proxyForHttps = (req, cltSocket, head,proxyedHostname, excludePattern, inc
         srvSocket.write(head);
         srvSocket.pipe(cltSocket);
         cltSocket.pipe(srvSocket);
+
       });
       srvSocket.on('error', (e) => {
         console.error('🔔',e);
