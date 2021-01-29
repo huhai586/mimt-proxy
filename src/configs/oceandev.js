@@ -14,8 +14,8 @@
         "ocean-dev"
     ],
     "localServerHostName": "http://localhost:3003",
-    // "proxyedHostname": "stnew03.beisen.com",
-    "proxyedHostname": "tencentcdn.bstatics.com",
+    "proxyedHostname": "stnew03.beisen.com",
+    // "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [],
     "enable": true
 }
