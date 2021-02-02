@@ -58,7 +58,6 @@ module.exports={
 
 | 属性  |说明  | 类型| 必须配置 | 默认值| 
 | ------------ |-------|--------| -----|-----|
-| proxyedHostname | 需要被代理的域名       |    string | no| stnew03.beisen.com
 | port | 代理运行的端口      |    number | no | 6789
 | localServerHostName | 本地工程运行的地址       |    string | no| http://localhost:3000
 | excludePattern | 指定不需要进行代理的path 特征        |   string or regexp string | no | []
@@ -158,6 +157,15 @@ bypass规则：请务必完整输入http协议/https协议 + hostname
 * 查找到具有完全交集的情况后，停止查找，从listhash表直接拿到对应的资源文件地址
 
 ###changelist
+2.0.0
+
+移除对proxyedHostname的支持
+
+为什么要移除？
+
+因为在开发过程中，经常要切换dev、test、online环境，这样很麻烦，且不必要，只要配合includePattern
+与excludePattern，同样能精确的匹配到本地资源
+
 1.4.21
 
 bugfix: 报错提示乱码

@@ -14,8 +14,8 @@
         "tms-setreport/release/app"
     ],
     "localServerHostName": "http://localhost:8002",
-    // "proxyedHostname": "stnew03.beisen.com",
-    "proxyedHostname": "tencentcdn.bstatics.com",
+    "proxyedHostname": "stnew03.beisen.com",
+    // "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [
         {
             "pathRewriteRule": "/ux/tms-setreport/release/app(.*)",

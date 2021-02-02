@@ -332,8 +332,6 @@ const createOptionFromCli = (configName) => {
   const md5 = md5File.sync(fileAddr);
   let options = {
     localServerHostName:  configValue.localServerHostName,
-    // port: configValue.port || program.port,
-    proxyedHostname:  configValue.proxyedHostname,
     excludePattern: configValue.excludePattern || [],
     includePattern: configValue.includePattern,
     customProxyRules: configValue.customProxyRules,
@@ -352,12 +350,10 @@ const deleteBlankItemInArray = (arr) => {
  * 解析customeRule
  * **/
 
-const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules = [], proxyedHostname, excludePattern, includePattern) => {
+const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules = [], excludePattern, includePattern) => {
   
   //
   
-  // 只有originUrl 的 hostname 与 originOptions.hostName 相等才进行下一步
-  if (originOptions.hostname !== proxyedHostname) return originOptions;
   if (isPathMatchRule(originOptions.path, excludePattern, includePattern) === false) return originOptions;
   
   let urlObj = url.parse(originUrl);
@@ -471,7 +467,6 @@ const configsManage = (function(){
     verifyConfigData: function(configDataObj){
       // 验证配置文件里面有如下必须值
       const mustProperty = ['localServerHostName',
-        'proxyedHostname',
         'excludePattern',
         'includePattern'];
       const hasAllProperty = !mustProperty.some(this.noProperty.bind(this,configDataObj));
@@ -554,15 +549,9 @@ const hashLoopsCheck = {
 const isStringSame = (str1, str2) => {
   return str1 === str2;
 }
-const isMatchHostName = (hostName = '') => {
-  const allConfigs = configsManage.getAllConfigs();
-  const configsInArray = Object.values(allConfigs);
-  return configsInArray.some((v) => {
-    const {fileData = {}} = v;
-    const {proxyedHostname = ''} = fileData;
-    return hostName === proxyedHostname
-  })
-}
+
+
+
 const getProxyRule = function(urlString){
   //从config中找到合适的配置
   //满足条件：符合proxyedHostname、includePattern、excludePattern
@@ -641,4 +630,3 @@ exports.getUrlFromOptions = getUrlFromOptions;
 exports.showMessage = showMessage;
 exports.configsManage = configsManage;
 exports.getProxyRule = getProxyRule;
-exports.isMatchHostName = isMatchHostName;

@@ -67,8 +67,8 @@ function createFakeHttpsWebSite(domain, successFun) {
       // excludePattern, includePattern, customProxyRules, proxyedHostname
     if (matchConfig) {
       // 有匹配的proxy文件
-      const {customProxyRules, proxyedHostname, excludePattern, includePattern } = matchConfig;
-      httpsOptions = createOptionsFromCustomRule(httpsOptions,req.url,customProxyRules, proxyedHostname, excludePattern, includePattern);
+      const {customProxyRules, excludePattern, includePattern } = matchConfig;
+      httpsOptions = createOptionsFromCustomRule(httpsOptions,req.url,customProxyRules, excludePattern, includePattern);
       req.url = httpsOptions.path;
       // 由于做了customRule判断，可能导致
       readyRequest(httpsOptions,matchConfig,res,req)
@@ -85,9 +85,8 @@ function createFakeHttpsWebSite(domain, successFun) {
   
 }
 function readyRequest(httpsOptions,matchConfig,res,req){
-  const {proxyedHostname,excludePattern,includePattern} = matchConfig;
+  const {excludePattern,includePattern} = matchConfig;
   const urlNeedRequestLocal = isUrlNeedRequestLocal(
-    proxyedHostname,
     httpsOptions.hostname,
     httpsOptions.path,
     excludePattern,

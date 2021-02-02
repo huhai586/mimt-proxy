@@ -14,8 +14,8 @@
         "ocean-mobile"
     ],
     "localServerHostName": "https://localhost:3000",
-    "proxyedHostname": "tencentcdn.bstatics.com",
-    // "proxyedHostname": "stnew03.beisen.com",
+    // "proxyedHostname": "tencentcdn.bstatics.com",
+    "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": true
 }
