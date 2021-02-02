@@ -253,12 +253,19 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
       realRes.pipe(res);
       return
     }
-    
-    
-    
+
+
+
+
     let body = '';
+
+    if (contentType.indexOf("javascript") !== -1) {
+      const injectCodePath = path.resolve(__dirname, `../common/injectCode.js`);
+      var data=fs.readFileSync(injectCodePath,"utf-8");
+
+      body = `${data};`
+    }
     realRes.on('data', (chunk) => {
-      // return '111' + chunk
       body += chunk;
     });
     

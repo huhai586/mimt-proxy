@@ -1,6 +1,8 @@
 const url = require('url');
 const net = require('net');
-const {isMatchHostName, configsManage} = require("./utils");
+const {configsManage} = require("./utils");
+const fs = require("fs");
+const path = require("path");
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 
 
@@ -16,7 +18,6 @@ const proxyForHttps = (req, cltSocket, head) => {
   }
   
   //初次检查，不符合的hostname直接转发
-  const isMatchHostNameCheck = isMatchHostName(srvUrl.hostname);
   const allConfigs = configsManage.getAllConfigs();
 
   if(allConfigs.length !== 0 ) {
@@ -27,8 +28,7 @@ const proxyForHttps = (req, cltSocket, head) => {
         cltSocket.write('HTTP/1.1 200 Connection Established\r\n' +
           'Proxy-agent: MITM-proxy\r\n' +
           '\r\n');
-        
-        srvSocket.write(head);
+
         cltSocket.pipe(srvSocket);
         srvSocket.pipe(cltSocket);
 
