@@ -8,13 +8,20 @@
  *
  * **/
  module.exports = {
-    "description": "Ocean-Mobile-资源",
+    "category": "Demo",
+    "version": "1.0.0",
+    "description": "demo",
     "excludePattern": [],
     "includePattern": [
-        "images"
+        "beisen-tab-layout"
     ],
-    "localServerHostName": "https://localhost:3000",
+    "localServerHostName": "http://localhost:3000",
     "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
+    "customProxyRules": [
+        {
+            "pathRewriteRule": "/ux/upaas/beisen-tab-layout/release/dist/main-71d52bc-1.0.31.min.js /demo.js",
+            "byPass": "http://192.168.199.66:8080"
+        }
+    ],
     "enable": false
 }

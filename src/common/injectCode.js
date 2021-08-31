@@ -1,5 +1,5 @@
 var  uniqClass = '--b-proxy-cli-proxy-tip';
-window.onload = function(){
+window.BProoxyCliTipFunc = function(){
   var tip = document.querySelector(uniqClass);
   if (!tip) {
     var tempTipDom = document.createElement('div');
@@ -10,3 +10,6 @@ window.onload = function(){
     console.warn("已经存在")
   }
 }
+
+window.removeEventListener("load", window.BProoxyCliTipFunc);
+window.addEventListener("load", window.BProoxyCliTipFunc);

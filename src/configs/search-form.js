@@ -8,10 +8,10 @@
  *
  * **/
  module.exports = {
-    "description": "鲁班searchForm 标准组件",
+    "description": "字段组件",
     "excludePattern": [],
     "includePattern": [
-        "beisen-platform-nusion-standard-search"
+        "platform-standard-datatable"
     ],
     "localServerHostName": "http://localhost:3001",
     "proxyedHostname": "stnew03.beisen.com",

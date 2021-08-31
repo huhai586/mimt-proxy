@@ -67,7 +67,7 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
     const currentItemNameInPieces = splitFileNameInPieces(v);
     prosibility[i] = calcPosPercentage(currentItemNameInPieces, fileNameInPieces)
   });
-  
+
   // 依据概率，找到最大值
   const theMaxProbabilityValue = Math.max(...prosibility)
   // 最大概率值应该只有一个
@@ -84,12 +84,12 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
       }
     });
     const mostMatchFile = mostMatchIndex.map((v) => arr[v]);
-    
+
     //todo 感觉有问题
     const result = mostMatchFile.filter((v) => {
      return  splitFileNameInPieces(v).length === fileNameInPieces.length
     });
-    
+
     if (result.length === 1) {
       console.log('非精确匹配了,',fileNameInPieces.join('.'));
       return getUrlFromAccurateMatch(linkHash[result[0]], originUrl);
@@ -99,7 +99,7 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
       console.log('找不到匹配')
     }
   }
-  
+
 }
 
 const matchResource = (fileNameInPieces = '', linkHash, originUrl) => {
@@ -107,15 +107,15 @@ const matchResource = (fileNameInPieces = '', linkHash, originUrl) => {
     console.log('异常，需要匹配的文件名为空');
     return ''
   };
-  
+
   const assetFileName = Object.keys(linkHash);
   const matchArr = assetFileName.filter((fileNameLocal) => {
     // fileNameLocal piecely
     const fileNameLocalPiece = splitFileNameInPieces(fileNameLocal);
-  
+
     const filtType = fileNameInPieces[fileNameInPieces.length -1];
     const filtTypeOfFileNameLocal = fileNameLocalPiece[fileNameLocalPiece.length -1];
-    
+
     // 先判断文件类型是否有问题
     if (filtType !== filtTypeOfFileNameLocal) return false
     // 将2个数组进行交集操作，判断2个array是否存在全交集
@@ -123,10 +123,10 @@ const matchResource = (fileNameInPieces = '', linkHash, originUrl) => {
     const fileNameInPiecesAfterRemoveRepeat = [...new Set([...fileNameInPieces])];
     const fileNameLocalPieceAfterRemoveRepeat = [...new Set([...fileNameLocalPiece])];
     const mixedArray = [... new Set([...fileNameInPiecesAfterRemoveRepeat, ...fileNameLocalPieceAfterRemoveRepeat])];
-    
+
     return mixedArray.length === Math.max(fileNameInPiecesAfterRemoveRepeat.length , fileNameLocalPieceAfterRemoveRepeat.length);
   });
-  
+
   return getUrlFromBlurryMatchArr(matchArr, fileNameInPieces, linkHash, originUrl);
 }
 
@@ -200,7 +200,7 @@ const setHeader = (realRes, res) => {
   //common header
   res.setHeader('Warning', "this file is from proxy server");
 
-  
+
   // 设置客户端响应的http头部
   Object.keys(realRes.headers).forEach(function(key) {
     if (key === 'content-length') {
@@ -209,7 +209,7 @@ const setHeader = (realRes, res) => {
     res.setHeader(key, realRes.headers[key]);
     hasCrosSetting = (key === 'access-control-allow-origin');
   });
-  
+
   if(hasCrosSetting === false) {
     // bugfix: web font 需要跨域
     res.setHeader('access-control-allow-origin', "*");
@@ -224,7 +224,7 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
   console.log("最终的url", `${options.protocol}//${options.hostname}:${options.port}${options.path}`)
   let chunkCount = 0;
   let httpMethod = isHttp ? http : https;
-  
+
   // 为了方便起见，直接去掉客户端请求所支持的压缩方式
   if(options.headers && options.headers['accept-encoding'] ) {
     delete options.headers['accept-encoding'];
@@ -232,7 +232,7 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
   if(options.headers && options.headers['cache-control'] ) {
     options.headers['cache-control'] = 'no-store';
   }
-  
+
   let realReq = httpMethod.request(options, (realRes) => {
     console.log("statusCode", realRes.statusCode);
     const {statusCode} = realRes;
@@ -241,7 +241,7 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
     const contentType = realRes.headers['content-type'];
     const isIgnoredType = isIgnoredContentType(contentType );
     if (isIgnoredType === false) realRes.setEncoding('utf8');
-    
+
     // if (!allowStatusCode.includes(statusCode)) {
     //   res.end('code:'+ realRes.statusCode + "  "+realRes.statusMessage + " 代理的文件无法访问");
     //   return
@@ -263,12 +263,12 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
       const injectCodePath = path.resolve(__dirname, `../common/injectCode.js`);
       var data=fs.readFileSync(injectCodePath,"utf-8");
 
-      body = `${data};`
+      body = `${data}`
     }
     realRes.on('data', (chunk) => {
       body += chunk;
     });
-    
+
     realRes.on('end', () => {
       let b = body;
       //https://stackoverflow.com/questions/17922748/what-is-the-correct-method-for-calculating-the-content-length-header-in-node-js
@@ -279,13 +279,13 @@ const requestRealTarget =  (options,req, res, isHttp = true) => {
       setHeader(realRes, res);
       res.end(b)
     })
-    
-    
+
+
   });
-  
+
   // 通过pipe的方式把客户端请求内容转发给目标服务器
   req.pipe(realReq);
-  
+
   realReq.on('error', (e) => {
     console.error(e);
   })
@@ -304,7 +304,7 @@ const createOptionsForLocalRequest = (localServerHostName) => {
       this.hostname = hostname;
       this.port = port;
       this.protocol = protocol;
-      
+
       const optionsDefault= {
         protocol: 'http:',
           hostname: "localhost",
@@ -319,8 +319,8 @@ const createOptionsForLocalRequest = (localServerHostName) => {
         path: optionsDefault.path,
         method: optionsDefault.method
       }
-    
-  
+
+
 }
 
 const getFileAddrByName = (fileName) => path.join(__dirname,`../configs/${fileName}`);
@@ -358,27 +358,27 @@ const deleteBlankItemInArray = (arr) => {
  * **/
 
 const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules = [], excludePattern, includePattern) => {
-  
+
   //
-  
+
   if (isPathMatchRule(originOptions.path, excludePattern, includePattern) === false) return originOptions;
-  
+
   let urlObj = url.parse(originUrl);
   let optionsNew = {...originOptions};
-  
+
   customProxyRules.some((ruleObj) => {
     const {pathRewriteRule, byPass} = ruleObj;
     let matchRule,replacedRule;
     const rulesDetail = deleteBlankItemInArray(pathRewriteRule.trim().split(" "));
-    
+
     if ((rulesDetail.length !== 2) && !ruleObj.pathReplaceFunc) {
       console.log("自定义规则中有多个非连续空格无法解析，只能存在一个或者多个连续空格 或不存在空格但是提供了替换函数pathReplaceFunc，请修改规则：", ruleObj);
       return false;
     }
-    
+
     matchRule = rulesDetail[0];
     replacedRule = ruleObj.pathReplaceFunc || rulesDetail[1];
-    
+
     let regRule = matchRule,regRuleType = 'g';
     const extractRule = matchRule.match(/^\/(.*)\/([gi]?)$/);
     if(extractRule) {
@@ -386,7 +386,7 @@ const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules =
       regRule = extractRule[1].replace("/",'\/');
       regRuleType = extractRule[2] ? extractRule[2] : 'g'
     }
-    
+
     let ruleInReg;
     try {
       ruleInReg = new RegExp(regRule, regRuleType);
@@ -394,8 +394,8 @@ const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules =
       console.log("正则表达式转换失败,请检查:", regRule);
       return false;
     }
-    
-    
+
+
     if (ruleInReg.test(urlObj.path)) {
       const pathAfterRewrite = urlObj.path.replace(ruleInReg, replacedRule);
       optionsNew.path = pathAfterRewrite;
@@ -478,7 +478,7 @@ const configsManage = (function(){
         'includePattern'];
       const hasAllProperty = !mustProperty.some(this.noProperty.bind(this,configDataObj));
       return hasAllProperty;
-    
+
     },
     update: function(configObj){
       const {configName, configData} = configObj;
@@ -520,7 +520,7 @@ const configsManage = (function(){
         this.configChangeMonitor();
       }, 6000)
     },
-    
+
   }
 })();
 
@@ -572,7 +572,7 @@ const getProxyRule = function(urlString){
       const {excludePattern:excludeArray, includePattern:includeArray} = config.fileData;
       return isUrlNeedRequestLocal(urlHostName,urlPath, excludeArray, includeArray)
   });
-  
+
   if (configMatched.length === 0) {
     console.log("没有配置文件符合当前的url", urlString);
     return
@@ -595,7 +595,7 @@ const getProxyRule = function(urlString){
 
 
 const paramModifyForConfig =  (fileName, data) => {
-  
+
   return new Promise((resolve, reject) => {
     const configFileAddress = path.join(__dirname,`../configs/${fileName}`);
     let configValue = require(configFileAddress);

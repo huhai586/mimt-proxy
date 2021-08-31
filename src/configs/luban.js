@@ -15,7 +15,7 @@
     "includePattern": [
         "ux-nusion-runtime"
     ],
-    "localServerHostName": "http://localhost:5002",
+    "localServerHostName": "http://localhost:5000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": false

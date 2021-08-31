@@ -17,7 +17,7 @@
     "includePattern": [
         "ux-nusion-editor"
     ],
-    "localServerHostName": "http://localhost:3000",
+    "localServerHostName": "https://localhost:3000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
     "enable": false

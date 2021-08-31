@@ -9,13 +9,14 @@
  * **/
  module.exports = {
     "description": "Ocean-Mobile",
-    "excludePattern": ['images'],
+    "excludePattern": [
+        "images"
+    ],
     "includePattern": [
         "ocean-mobile"
     ],
     "localServerHostName": "https://localhost:3000",
-    // "proxyedHostname": "tencentcdn.bstatics.com",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

@@ -15,16 +15,11 @@
     ],
     "localServerHostName": "http://localhost:8002",
     "proxyedHostname": "stnew03.beisen.com",
-    // "proxyedHostname": "tencentcdn.bstatics.com",
     "customProxyRules": [
         {
             "pathRewriteRule": "/ux/tms-bti/release/app(.*)",
-            "pathReplaceFunc": function (originParam) {
-                const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
-                return replaceExtraStr
-            },
             "byPass": "http://localhost:8002"
         }
     ],
-    "enable": true
+    "enable": false
 }

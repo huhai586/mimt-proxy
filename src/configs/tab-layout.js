@@ -8,13 +8,11 @@
  *
  * **/
  module.exports = {
-    "description": "Ocean-Mobile-资源",
+    "description": "tab-layout",
     "excludePattern": [],
     "includePattern": [
-        "images"
+        "beisen-tab-layout"
     ],
-    "localServerHostName": "https://localhost:3000",
-    "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
+    "localServerHostName": "http://localhost:3001",
     "enable": false
 }

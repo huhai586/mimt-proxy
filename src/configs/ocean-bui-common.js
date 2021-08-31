@@ -7,18 +7,18 @@
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
-
-
-// 使用此配置文件，运行的命令为bui-common 中的start 命令
  module.exports = {
     "description": "BUI-Common",
-    "excludePattern": ['images', 'css'],
+    "excludePattern": [
+        "images",
+        "css"
+    ],
     "includePattern": [
-        "tms-bti",'release/dist'
+        "tms-bti",
+        "release/dist"
     ],
     "localServerHostName": "http://localhost:8003",
     "proxyedHostname": "tencentcdn.bstatics.com",
-    // "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

@@ -14,8 +14,7 @@
         "images"
     ],
     "localServerHostName": "https://localhost:3000",
-    // "proxyedHostname": "ocean.italent.link",
-   "proxyedHostname": "ocean.italent-inc.cn",
-   "customProxyRules": [],
-    "enable": true
+    "proxyedHostname": "ocean.italent-inc.cn",
+    "customProxyRules": [],
+    "enable": false
 }
