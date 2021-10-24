@@ -8,13 +8,11 @@
  *
  * **/
  module.exports = {
-    "description": "菜单组管理",
+    "description": "isv-nusion-common-header",
     "excludePattern": [],
     "includePattern": [
-        "ux-p-platfrom-charge"
+        "isv-nusion-common-header"
     ],
-    "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
-    "enable": true
+    "localServerHostName": "http://localhost:3001",
+    "enable": false
 }

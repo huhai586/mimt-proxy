@@ -8,13 +8,13 @@
  *
  * **/
  module.exports = {
-    "description": "菜单组管理",
+    "description": "打印form",
     "excludePattern": [],
     "includePattern": [
-        "ux-p-platfrom-charge"
+        "beisen-platform-print-template-select-form"
     ],
-    "localServerHostName": "http://localhost:3000",
+    "localServerHostName": "http://localhost:8088",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

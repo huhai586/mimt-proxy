@@ -38,13 +38,13 @@ const caKey = forge.pki.privateKeyFromPem(caKeyPem);
  * @return {[type]}            [description]
  */
 function createFakeHttpsWebSite(domain, successFun) {
-  
+
   const fakeCertObj = global[domain] ? global[domain] : createFakeCertificateByDomain(caKey, caCert, domain)
   var fakeServer = new https.createServer({
     key: fakeCertObj.key,
     cert: fakeCertObj.cert
   });
-  
+
   fakeServer.listen(0, () => {
     var address = fakeServer.address();
     successFun(address.port);
@@ -52,7 +52,7 @@ function createFakeHttpsWebSite(domain, successFun) {
   //本地的https server 监听到传入请求
   fakeServer.on('request', (req, res) => {
     //stnew03 中的资源并不是所有都需要转发
-    
+
     let httpsOptions =  {
       protocol: 'https:',
       hostname: req.headers.host.split(':')[0],
@@ -61,7 +61,7 @@ function createFakeHttpsWebSite(domain, successFun) {
       path: req.url,
       headers: req.headers,
     };
-    
+
     const urlStr = `${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`;
     const matchConfig = getProxyRule(urlStr);
       // excludePattern, includePattern, customProxyRules, proxyedHostname
@@ -82,7 +82,7 @@ function createFakeHttpsWebSite(domain, successFun) {
   fakeServer.on('error', (e) => {
     console.error(e);
   });
-  
+
 }
 function readyRequest(httpsOptions,matchConfig,res,req){
   const {excludePattern,includePattern} = matchConfig;
@@ -90,9 +90,10 @@ function readyRequest(httpsOptions,matchConfig,res,req){
     httpsOptions.hostname,
     httpsOptions.path,
     excludePattern,
-    includePattern
+    includePattern,
+    matchConfig,
   );
-  
+
   if (urlNeedRequestLocal) {
     requestWebpackDevServer(createOptionsForLocalRequest(matchConfig.localServerHostName), res, req);
   } else {
@@ -115,7 +116,7 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
   var keys = pki.rsa.generateKeyPair(2048);
   var cert = pki.createCertificate();
   cert.publicKey = keys.publicKey;
-  
+
   cert.serialNumber = (new Date()).getTime()+'';
   cert.validity.notBefore = new Date();
   cert.validity.notBefore.setFullYear(cert.validity.notBefore.getFullYear() - 1);
@@ -140,10 +141,10 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
     shortName: 'OU',
     value: 'https://www.huhai.site'
   }];
-  
+
   cert.setIssuer(caCert.subject.attributes);
   cert.setSubject(attrs);
-  
+
   cert.setExtensions([{
     name: 'basicConstraints',
     critical: true,
@@ -183,9 +184,9 @@ function createFakeCertificateByDomain(caKey, caCert, domain) {
     {
       name:'authorityKeyIdentifier'
     }]);
-  
+
   cert.sign(caKey, forge.sha512.create());
-  
+
   var certPem = pki.certificateToPem(cert);
   var keyPem = pki.privateKeyToPem(keys.privateKey);
   const m2 = new Date().getTime()

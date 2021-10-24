@@ -8,13 +8,12 @@
  *
  * **/
  module.exports = {
-    "description": "菜单组管理",
+    "description": "biui-reactapp",
     "excludePattern": [],
     "includePattern": [
-        "ux-p-platfrom-charge"
+        "reactapp"
     ],
-    "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:8003",
     "customProxyRules": [],
-    "enable": true
+    "enable": false
 }

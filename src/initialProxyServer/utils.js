@@ -180,8 +180,25 @@ const isPathMatchRule = (urlPath,excludeArray, includeArray) => {
   })
   return matchExclude && matchInclude
 }
-const isUrlNeedRequestLocal = (urlHostName,urlPath, excludeArray = [], includeArray = []) => {
-  return isPathMatchRule(urlPath,excludeArray, includeArray)
+
+const isHostNameEqualByPass = (matchConfig = {},urlHostName) => {
+  const {customProxyRules} = matchConfig;
+  if (Array.isArray(customProxyRules) && (customProxyRules.length !== 0)) {
+    return customProxyRules.some((v) => {
+      const {byPass} = v;
+      if (!!byPass) {
+        return byPass.indexOf(urlHostName) !== -1
+      }
+    })
+  } else {
+    return false
+  }
+}
+
+const isUrlNeedRequestLocal = (urlHostName,urlPath, excludeArray = [], includeArray = [], matchConfig) => {
+  const validPathSuc = isPathMatchRule(urlPath,excludeArray, includeArray);
+  const isHostNameNotEqualByPass = !isHostNameEqualByPass(matchConfig,urlHostName);
+  return validPathSuc && isHostNameNotEqualByPass
 }
 
 // octet-stream代表二进制数据
@@ -207,7 +224,9 @@ const setHeader = (realRes, res) => {
       return
     }
     res.setHeader(key, realRes.headers[key]);
-    hasCrosSetting = (key === 'access-control-allow-origin');
+    if (hasCrosSetting === false) {
+      hasCrosSetting = (key === 'access-control-allow-origin');
+    }
   });
 
   if(hasCrosSetting === false) {

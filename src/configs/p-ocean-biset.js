@@ -8,13 +8,13 @@
  *
  * **/
  module.exports = {
-    "description": "菜单组管理",
-    "excludePattern": [],
-    "includePattern": [
-        "ux-p-platfrom-charge"
+    "description": "p-ocean-biset",
+    "excludePattern": [
+        "i18n"
     ],
-    "localServerHostName": "http://localhost:3000",
-    "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [],
-    "enable": true
+    "includePattern": [
+        "p-ocean-bitset"
+    ],
+    "localServerHostName": "https://localhost:3004",
+    "enable": false
 }
