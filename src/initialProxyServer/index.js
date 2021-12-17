@@ -44,35 +44,35 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
     console.log("接收到http代理请求",req.url);
     const ip =extractIPFromAdrInfo(req.socket.remoteAddress);
     (ip !== '::1') && accessDeveiceManage.add(ip)
-    
+
     ProxyForHttp(req,res,getProxyRule(req.url));
     res.on('error', () => {
       console.log('😩响应异常中断')
     })
   });
 
-// 代理https请求
-// https的请求通过http隧道方式转发
+  // 代理https请求
+  // https的请求通过http隧道方式转发
   httpMitmProxy.on('connect', (req, cltSocket, head) => {
     console.log("接收到connect请求",req.url);
     const ip =extractIPFromAdrInfo(cltSocket.remoteAddress);
     (ip !== '::1') && accessDeveiceManage.add(ip)
     ProxyForHttps(req,cltSocket, head);
-    
+
     cltSocket.on('error', () => {
       console.log('😩响应异常中断');
     })
   });
-  
+
   httpMitmProxy.listen(port, function () {
     const msg = `💚HTTP/HTTPS中间人代理启动成功，端口：${port}`
     console.log(msg);
     startUpCallBack && startUpCallBack({startSuc: true, msg});
     //配置文件变化监听& handle 。为了处理外部文件变更
     configsManage.configChangeMonitor();
-  
+
   });
-  
+
   httpMitmProxy.on('error', (e) => {
     if (e.code == 'EADDRINUSE') {
       console.error('😰HTTP/HTTPS中间人代理启动失败！！');

@@ -30,6 +30,21 @@ const caKeyPem = fs.readFileSync(caKeyPath);
 const caCert = forge.pki.certificateFromPem(caCertPem);
 const caKey = forge.pki.privateKeyFromPem(caKeyPem);
 
+
+function getConfigOnlyMatchHostName (hostName) {
+
+}
+
+function makeLastHttpsOption (urlStr, httpsOption) {
+  //即便没有任何匹配，只要符合hostName，那么也考虑customRule
+  const config = getProxyRule(urlStr, true);
+  if (config) {
+    debugger
+  } else {
+    return httpsOption
+  }
+
+}
 /**
  * 根据CA证书生成一个伪造的https服务
  * @param  {[type]} ca         [description]
@@ -52,7 +67,6 @@ function createFakeHttpsWebSite(domain, successFun) {
   //本地的https server 监听到传入请求
   fakeServer.on('request', (req, res) => {
     //stnew03 中的资源并不是所有都需要转发
-
     let httpsOptions =  {
       protocol: 'https:',
       hostname: req.headers.host.split(':')[0],
@@ -61,8 +75,8 @@ function createFakeHttpsWebSite(domain, successFun) {
       path: req.url,
       headers: req.headers,
     };
+    let urlStr = `${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`;
 
-    const urlStr = `${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`;
     const matchConfig = getProxyRule(urlStr);
       // excludePattern, includePattern, customProxyRules, proxyedHostname
     if (matchConfig) {

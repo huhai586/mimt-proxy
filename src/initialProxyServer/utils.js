@@ -5,6 +5,7 @@ const https = require('https');
 const notifier = require('node-notifier');
 const fs = require('fs');
 const md5File = require('md5-file');
+const {MatchStrategy} = require("./consts");
 
 
 const extractAsset = (str = '') => {
@@ -162,17 +163,29 @@ const removeFileNameAndType = (str = '') => {
   const replaceResult = str.replace(/(.*)\/(.*)/, '$1')
   return replaceResult;
 };
-const isMatchInclude = (urlPath, includeArray) => {
+const isMatchInclude = (urlPath, includeArray, includeMatchStrategy) => {
     if (includeArray === undefined || includeArray.length === 0) return true;
-    return includeArray.every((rule) => {
+    let matchType;
+    switch (includeMatchStrategy) {
+      case MatchStrategy.every:
+        matchType = Array.prototype.every;
+        break;
+      case MatchStrategy.some:
+        matchType = Array.prototype.some;
+        break;
+      default:
+        console.log("无法识别的includeMatchStrategy匹配策略", includeMatchStrategy)
+    }
+    const matchFunc = (rule) => {
       //判断rule是否match url
       const ruleInreg = new RegExp(rule);
       return ruleInreg.test(urlPath);
-    })
+    }
+    return matchType.call(includeArray, matchFunc)
 }
 
-const isPathMatchRule = (urlPath,excludeArray, includeArray) => {
-  const matchInclude =  isMatchInclude(urlPath, includeArray);
+const isPathMatchRule = (urlPath,excludeArray, includeArray, includeMatchStrategy) => {
+  const matchInclude =  isMatchInclude(urlPath, includeArray, includeMatchStrategy);
   const matchExclude = !excludeArray.some((rule) => {
     //判断rule是否match url
     const ruleInreg = new RegExp(rule);
@@ -195,10 +208,12 @@ const isHostNameEqualByPass = (matchConfig = {},urlHostName) => {
   }
 }
 
-const isUrlNeedRequestLocal = (urlHostName,urlPath, excludeArray = [], includeArray = [], matchConfig) => {
-  const validPathSuc = isPathMatchRule(urlPath,excludeArray, includeArray);
-  const isHostNameNotEqualByPass = !isHostNameEqualByPass(matchConfig,urlHostName);
-  return validPathSuc && isHostNameNotEqualByPass
+const isMatchConfig = (config, urlObject) => {
+  const {hostname, path} = urlObject;
+  const {excludeArray = [], includeArray = [], includeMatchStrategy= MatchStrategy.every, proxyedHostname} = config;
+  const validPathSuc = isPathMatchRule(path,excludeArray, includeArray, includeMatchStrategy);
+  const validHostNameSuc = proxyedHostname ? proxyedHostname === hostname : true
+  return validPathSuc && validHostNameSuc
 }
 
 // octet-stream代表二进制数据
@@ -586,10 +601,7 @@ const getProxyRule = function(urlString){
   const urlObject = url.parse(urlString);
 
     const configMatched = configsInArray.filter((config) => {
-      const urlHostName = urlObject.hostname;
-      const urlPath = urlObject.path;
-      const {excludePattern:excludeArray, includePattern:includeArray} = config.fileData;
-      return isUrlNeedRequestLocal(urlHostName,urlPath, excludeArray, includeArray)
+      return isMatchConfig(config.fileData, urlObject)
   });
 
   if (configMatched.length === 0) {
@@ -647,7 +659,7 @@ exports.extractAsset = extractAsset;
 exports.getFileName = getFileName;
 exports.splitFileNameInPieces = splitFileNameInPieces;
 exports.matchResource = matchResource;
-exports.isUrlNeedRequestLocal = isUrlNeedRequestLocal;
+exports.isUrlNeedRequestLocal = isMatchConfig;
 exports.requestRealTarget = requestRealTarget;
 exports.createOptionsForLocalRequest = createOptionsForLocalRequest;
 exports.createOptionFromCli = createOptionFromCli;

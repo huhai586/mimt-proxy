@@ -17,18 +17,18 @@ const wsAbout = {
     let allFiels = fs.readdirSync(path.join(__dirname,'../configs'), 'utf8');
     allFiels = allFiels.filter((v) => { return /\.js$/.test(v)});
     const allFielsInfo = [];
-    
+
     allFiels.forEach((fileName) => {
       const filePath = `${path.join(__dirname,'../configs')}/${fileName}`;
       delete require.cache[filePath];
       const fileData = require(filePath);
-      
+
       allFielsInfo.push({
         fileName,
         fileData
       })
     });
-    
+
     return allFielsInfo;
   },
   selectConfig: function(payload){
@@ -38,15 +38,15 @@ const wsAbout = {
       // proxyServer.close && proxyServer.close()
     }
     selectConfig({configName: `${fileName}`}, this.startUpCallBack.bind(this, fileName, fileData),this.selectPort)
-    
+
   },
   createFile: () => {
     const proxyServer = getProxyServer();
     const {port} = proxyServer.address();
     const curIP = getIP();
-    
+
     // 创建file并写入friendPage\build
-    
+
     const str = `
       function FindProxyForURL(url, host) {
         return "PROXY ${curIP}:${port}";
@@ -83,7 +83,7 @@ const wsAbout = {
         this.movePAC2build()
       }
     });
-    
+
   },
   getPacAddress:function() {
     const curIP = getIP();
@@ -108,28 +108,28 @@ const wsAbout = {
         }
       })
     }
-    
+
   },
   startUpCallBack: function(fileName,fileData, statusObj){
     const params = {action: actions.START_CALLBACK, payload: {...statusObj, fileName, fileData}};
-    
+
     this.initPacFile();
     // this.ws.send(JSON.stringify(params))
     this.sendMessage(params);
-    
+
   },
   sendMessage: function(params){
     this.wss.clients.forEach(function each(client) {
-      
+
       // console.log('IT IS GETTING INSIDE CLIENTS');
       // console.log(client);
-      
+
       // The data is coming in correctly
       // console.log(data);
       client.send(JSON.stringify(params));
     });
   },
-  
+
   getCurrentConfig: function(){
     return configsManage.getAllConfigs();
   },
@@ -192,16 +192,13 @@ const wsAbout = {
         break;
       case actions.STOP_CONFIG:
         return this.stopConfig(msgJson.payload);
-        break;
       case actions.BAN_CONFIG:
         return this.banConfig(msgJson.payload);
-        break;
       case actions.TURN_ON_CONFIG:
         return this.turnOnConfig(msgJson.payload);
-        break;
       default :
         console.log("未找到对应数据",msgJson.action);
-      
+
     }
   },
   initWs: function() {
@@ -221,7 +218,7 @@ const wsAbout = {
         const info = this.getMatchInfoFromAction(msg);
         this.handleInfo(info,msg)
       });
-      
+
     });
   },
   handleInfo : function(info,msg) {
@@ -238,13 +235,13 @@ const wsAbout = {
       const params = {action: msg.action, payload: info};
       this.sendMessage(params);
     }
-    
+
 
   },
   initWsAndHttpServer: function(port = 6789){
     // 设置唯一端口
     if(!!this.selectPort === false) this.selectPort =  port;
-    
+
     //启动ws
     this.initWs();
     //启动http server
@@ -254,10 +251,10 @@ const wsAbout = {
     app.use(express.static(path.join(__dirname,'./friendPage/build')))
     app.get('/', (req, res) => res.sendFile(indexHtml))
     app.listen(1347,'0.0.0.0', () => {
-      console.log('app listening on port 1347!');
+      console.log('"配置选择"服务器已经在1347端口上启动');
       open("http://localhost:1347");
     })
-    
+
   }
 };
 
