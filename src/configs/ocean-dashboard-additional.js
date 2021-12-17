@@ -8,13 +8,15 @@
  *
  * **/
  module.exports = {
-    "description": "ux-portal-ui",
+    "category": "鲁班",
+    "version": "1.0.0",
+    "description": "ocean-图表dashboard-其他资源",
     "excludePattern": [],
     "includePattern": [
-        "ux-p-portal-ui"
+        "ChartSkeleton"
     ],
-    "localServerHostName": "http://localhost:3001",
-    "proxyedHostname": "stnew03.beisen.com",
+    "localServerHostName": "http://localhost:3008",
+    "proxyedHostname": "tcdn.bstatics.com",
     "customProxyRules": [],
-    "enable": false
+    "enable": true
 }
