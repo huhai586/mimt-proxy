@@ -10,23 +10,21 @@
  module.exports = {
     "category": "鲁班",
     "version": "1.0.0",
-    "description": "ocean-图表详情页面",
+    "description": "ocean-图表详情页面-images",
     "excludePattern": [
         "monaco"
     ],
     "includePattern": [
-        'ocean-mobile-report-detail-page','huhai112'
+        'images'
     ],
-   "includeMatchStrategy": "some",
     "localServerHostName": "http://localhost:3007",
     "proxyedHostname": "tcdn.bstatics.com",
-    "requestMiddleware": [
+    "customProxyRules": [
       {
-        "originUrlPathFragment": "1.0.66",
-        "fragmentTransformer": (a,b,c,d) => {
-          return 'xxxx'
-        },
-        "route2Host": ""
+        "pathRewriteRule": "1.0.62 xxxxx"
+      },
+      {
+        "pathRewriteRule": "1.0.66 xxxxx"
       }
     ],
     "enable": true

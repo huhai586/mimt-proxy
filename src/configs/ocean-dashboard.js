@@ -23,7 +23,7 @@
         "pathRewriteRule": "/ChartSkeleton-Line-(.*).js/g ChartSkeleton-Line.js",
       },
       {
-        "pathRewriteRule": "1.0.62 xxxxx"
+        "pathRewriteRule": "1.0.66 xxxxx"
       }
     ],
     "enable": true
