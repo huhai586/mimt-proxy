@@ -9,7 +9,7 @@ const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 const proxyForHttps = (req, cltSocket, head) => {
   // connect to an origin server
   let srvUrl = url.parse(`http://${req.url}`);
-  console.log('-----------------------------------------------------------')
+  console.log('\x1B[36m%s\x1B[0m','-----------------------------------------------------------')
   console.log('🔐️ https请求传入', ` 🚥 ${srvUrl.hostname}`);
 
   //初次检查，不符合的hostname直接转发

@@ -48,7 +48,7 @@ const requestWebpackDevServer = (optionsForLocalRequest, res, req) => {
       console.log('本地请求参数为:',JSON.stringify(byPassRequestOptions) );
       requestRealTarget(byPassRequestOptions, req, res, byPassRequestOptions.protocol === 'http:');
     } else {
-      console.log("😢未能在本地找到匹配文件,", fileNameWithType,'将返回404');
+      console.log('\x1B[31m%s\x1B[0m', "😢未能在本地找到匹配文件,", fileNameWithType,'将返回404');
       res.writeHead(404, {'Content-Type': 'text/html'});
 
       var path = require("path");

@@ -92,12 +92,12 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
     });
 
     if (result.length === 1) {
-      console.log('非精确匹配了,',fileNameInPieces.join('.'));
+      console.log('\x1B[31m%s\x1B[0m', '非精确匹配了,',fileNameInPieces.join('.'));
       return getUrlFromAccurateMatch(linkHash[result[0]], originUrl);
     } else if (result.length > 1){
-      console.log('多个匹配出现，无法区分')
+      console.log('\x1B[31m%s\x1B[0m','多个匹配出现，无法区分')
     } else if (result.length < 1) {
-      console.log('找不到匹配')
+      console.log('\x1B[31m%s\x1B[0m','找不到匹配')
     }
   }
 
@@ -105,7 +105,7 @@ const matchFileFromArray = (arr, fileNameInPieces, linkHash, originUrl) => {
 
 const matchResource = (fileNameInPieces = '', linkHash, originUrl) => {
   if (fileNameInPieces === '') {
-    console.log('异常，需要匹配的文件名为空');
+    console.log('\x1B[31m%s\x1B[0m','异常，需要匹配的文件名为空');
     return ''
   };
 
@@ -142,7 +142,7 @@ const getUrlFromBlurryMatchArr = (blurryMatchArr, fileNameInPieces, linkHash, or
 const getUrlFromAccurateMatch = (urlArr = [], originUrl) => {
   // 匹配到0个
   if (urlArr.length === 0) {
-    console.log('😢error: 资源没有url地址');
+    console.log('\x1B[31m%s\x1B[0m', '😢error: 资源没有url地址');
     return '';
   }
   // 匹配到1个
@@ -174,7 +174,7 @@ const isMatchInclude = (urlPath, includeArray, includeMatchStrategy) => {
         matchType = Array.prototype.some;
         break;
       default:
-        console.log("无法识别的includeMatchStrategy匹配策略", includeMatchStrategy)
+        console.log('\x1B[31m%s\x1B[0m', "无法识别的includeMatchStrategy匹配策略", includeMatchStrategy)
     }
     const matchFunc = (rule) => {
       //判断rule是否match url
@@ -467,7 +467,7 @@ const configsManage = (function(){
     noProperty: function(configDataObj,propertyName){
       const noAttr = configDataObj[propertyName] === undefined;
       if (noAttr) {
-        console.log(`配置文件中，没有必填项目${propertyName}，请检查!,当前配置文件将被忽略`)
+        console.log('\x1B[31m%s\x1B[0m',`配置文件中，没有必填项目${propertyName}，请检查!,当前配置文件将被忽略`)
       };
       return noAttr;
     },
@@ -484,7 +484,7 @@ const configsManage = (function(){
       const {configName, configData} = configObj;
       const verifySuc = this.verifyConfigData(configData);
       if (verifySuc === false) {
-        console.log(`${configName} 配置文件格式有误，不能被添加`)
+        console.log('\x1B[31m%s\x1B[0m', `${configName} 配置文件格式有误，不能被添加`)
       } else {
         allConfigs[configName] = configData;
       }
@@ -610,8 +610,8 @@ const paramModifyForConfig =  (fileName, data) => {
     // fs.w
     fs.writeFile(configFileAddress, strPrend + v, function (err) {
       if (err) {
-        console.log('There has an error saving your configuration data.');
-        console.log(err.message);
+        console.log('\x1B[31m%s\x1B[0m','There has an error saving your configuration data.');
+        console.log('\x1B[31m%s\x1B[0m',err.message);
         reject("failure")
         return;
       }

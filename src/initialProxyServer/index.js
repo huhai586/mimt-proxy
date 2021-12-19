@@ -58,7 +58,7 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
 
     ProxyForHttp(req,res,getProxyRule(httpOptions), httpOptions);
     res.on('error', () => {
-      console.log('😩响应异常中断')
+      console.log('\x1B[31m%s\x1B[0m','😩响应异常中断')
     })
   });
 
@@ -71,7 +71,7 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
     ProxyForHttps(req,cltSocket, head);
 
     cltSocket.on('error', () => {
-      console.log('😩响应异常中断');
+      console.log('\x1B[31m%s\x1B[0m', '😩响应异常中断');
     })
   });
 
@@ -86,11 +86,11 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
 
   httpMitmProxy.on('error', (e) => {
     if (e.code == 'EADDRINUSE') {
-      console.error('😰HTTP/HTTPS中间人代理启动失败！！');
-      console.error(`端口：${port}，已被占用。`);
+      console.error('\x1B[31m%s\x1B[0m', '😰HTTP/HTTPS中间人代理启动失败！！');
+      console.error('\x1B[31m%s\x1B[0m', `端口：${port}，已被占用。`);
       startUpCallBack && startUpCallBack({startSuc: false, msg: `当前配置启动失败，端口：${port}，已被占用。`})
     } else {
-      console.error(e);
+      console.error('\x1B[31m%s\x1B[0m', e);
     }
   });
 }
