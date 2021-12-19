@@ -194,26 +194,11 @@ const isPathMatchRule = (urlPath,excludeArray, includeArray, includeMatchStrateg
   return matchExclude && matchInclude
 }
 
-const isHostNameEqualByPass = (matchConfig = {},urlHostName) => {
-  const {customProxyRules} = matchConfig;
-  if (Array.isArray(customProxyRules) && (customProxyRules.length !== 0)) {
-    return customProxyRules.some((v) => {
-      const {byPass} = v;
-      if (!!byPass) {
-        return byPass.indexOf(urlHostName) !== -1
-      }
-    })
-  } else {
-    return false
-  }
-}
-
-const isMatchConfig = (config, urlObject) => {
-  const {hostname, path} = urlObject;
-  const {excludeArray = [], includeArray = [], includeMatchStrategy= MatchStrategy.every, proxyedHostname} = config;
-  const validPathSuc = isPathMatchRule(path,excludeArray, includeArray, includeMatchStrategy);
-  const validHostNameSuc = proxyedHostname ? proxyedHostname === hostname : true
-  return validPathSuc && validHostNameSuc
+const isMatchConfig = (config, httpsOptions) => {
+  const {path} = httpsOptions;
+  const {excludePattern = [], includePattern = [], includeMatchStrategy= MatchStrategy.every, localServerHostName} = config;
+  const validPathSuc = isPathMatchRule(path,excludePattern, includePattern, includeMatchStrategy);
+  return validPathSuc
 }
 
 // octet-stream代表二进制数据
@@ -362,7 +347,7 @@ const getFileHashByNameAsync = (fileName) => {
   const fileAddr = getFileAddrByName(fileName);
   return md5File(fileAddr)
 }
-const createOptionFromCli = (configName) => {
+const readFileDataByName = (configName) => {
   let configValue = {}
   let fileAddr = getFileAddrByName(configName);
   if (configName) {
@@ -372,81 +357,62 @@ const createOptionFromCli = (configName) => {
   }
   const md5 = md5File.sync(fileAddr);
   let options = {
-    localServerHostName:  configValue.localServerHostName,
-    excludePattern: configValue.excludePattern || [],
-    includePattern: configValue.includePattern,
-    customProxyRules: configValue.customProxyRules,
+    ...configValue,
     fileHash: md5
   }
   return options;
 }
 
 
-const deleteBlankItemInArray = (arr) => {
-  return arr.filter((v) => {
-    return v !== ''
-  })
-};
+const isRegExp = (str) => {
+  try {
+    new RegExp(str)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+
+const getIsPathMatch = (pathString, pathMatchRule) => {
+  if (isRegExp(pathMatchRule)) {
+    return (new RegExp(pathMatchRule)).test(pathString)
+  } else {
+    return pathString.indexOf(pathMatchRule) !== -1
+  }
+}
 /**
  * 解析customeRule
  * **/
 
-const createOptionsFromCustomRule = (originOptions, originUrl,customProxyRules = [], excludePattern, includePattern) => {
+const updateRequestOptionsByCustomRules = (originOptions, config) => {
+  let optionsTemp = {...originOptions};
 
-  //
+  config.requestMiddleware.some((ruleObj) => {
+    const {originUrlPathFragment, fragmentTransformer, route2Host} = ruleObj;
+    let pathMatchRule = '';
 
-  if (isPathMatchRule(originOptions.path, excludePattern, includePattern) === false) return originOptions;
-
-  let urlObj = url.parse(originUrl);
-  let optionsNew = {...originOptions};
-
-  customProxyRules.some((ruleObj) => {
-    const {pathRewriteRule, byPass} = ruleObj;
-    let matchRule,replacedRule;
-    const rulesDetail = deleteBlankItemInArray(pathRewriteRule.trim().split(" "));
-
-    if ((rulesDetail.length !== 2) && !ruleObj.pathReplaceFunc) {
-      console.log("自定义规则中有多个非连续空格无法解析，只能存在一个或者多个连续空格 或不存在空格但是提供了替换函数pathReplaceFunc，请修改规则：", ruleObj);
-      return false;
+    if (isRegExp(originUrlPathFragment)) {
+      pathMatchRule = new RegExp(originUrlPathFragment)
+    } else {
+      pathMatchRule = originUrlPathFragment
     }
+    const isPathMatch = getIsPathMatch(optionsTemp.path, pathMatchRule);
 
-    matchRule = rulesDetail[0];
-    replacedRule = ruleObj.pathReplaceFunc || rulesDetail[1];
-
-    let regRule = matchRule,regRuleType = 'g';
-    const extractRule = matchRule.match(/^\/(.*)\/([gi]?)$/);
-    if(extractRule) {
-      //使用了js正则表达式
-      regRule = extractRule[1].replace("/",'\/');
-      regRuleType = extractRule[2] ? extractRule[2] : 'g'
-    }
-
-    let ruleInReg;
-    try {
-      ruleInReg = new RegExp(regRule, regRuleType);
-    } catch(e) {
-      console.log("正则表达式转换失败,请检查:", regRule);
-      return false;
-    }
-
-
-    if (ruleInReg.test(urlObj.path)) {
-      const pathAfterRewrite = urlObj.path.replace(ruleInReg, replacedRule);
-      optionsNew.path = pathAfterRewrite;
-      if(byPass) {
-        // by pass
-        const byPassObj = url.parse(byPass);
-        const {protocol,port,hostname} = byPassObj;
-        optionsNew.protocol = protocol;
-        optionsNew.port = port ? port : (protocol === 'http:' ? 80 : 443);
-        // options.path = options.path;
-        optionsNew.hostname = hostname;
+    if (isPathMatch) {
+      const pathAfterRewrite = optionsTemp.path.replace(pathMatchRule, fragmentTransformer);
+      optionsTemp.path = pathAfterRewrite;
+      if(route2Host) {
+        const httpUrlParsed = url.parse(route2Host);
+        const {protocol,port,hostname} = httpUrlParsed;
+        optionsTemp.protocol = protocol;
+        optionsTemp.port = port ? port : (protocol === 'http:' ? 80 : 443);
+        optionsTemp.hostname = hostname;
       }
       return true;
     }
   });
-  optionsNew.headers.host = optionsNew.hostname;
-  return optionsNew;
+  optionsTemp.headers.host = optionsTemp.hostname;
+  return optionsTemp;
 }
 
 const getUrlFromOptions = (options) => {
@@ -582,7 +548,7 @@ const hashLoopsCheck = {
   },
   updateConfig: function(fileName,updateConfig) {
     //读取fileName对应的config
-    const configData = createOptionFromCli(fileName);
+    const configData = readFileDataByName(fileName);
     updateConfig({configName:fileName, configData});
     console.log(`${fileName}文件发生变化，已主动更新`)
   }
@@ -593,19 +559,18 @@ const isStringSame = (str1, str2) => {
 
 
 
-const getProxyRule = function(urlString){
+const getProxyRule = function(httpsOptions){
   //从config中找到合适的配置
   //满足条件：符合proxyedHostname、includePattern、excludePattern
   const allConfigs = configsManage.getAllConfigs();
   const configsInArray = Object.values(allConfigs);
-  const urlObject = url.parse(urlString);
 
-    const configMatched = configsInArray.filter((config) => {
-      return isMatchConfig(config.fileData, urlObject)
+  const configMatched = configsInArray.filter((config) => {
+      return isMatchConfig(config.fileData, httpsOptions)
   });
 
   if (configMatched.length === 0) {
-    console.log("没有配置文件符合当前的url", urlString);
+    console.log("没有配置文件符合当前的url", httpsOptions);
     return
   }
   if (configMatched.length === 1) {
@@ -613,11 +578,11 @@ const getProxyRule = function(urlString){
   }
   if (configMatched.length > 1) {
     const e = {};
-    const fileName = urlString.replace(/(.*)\/(.*)$/,'$2');
-    console.log(`${urlString}找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确`);
+    const fileName = httpsOptions.path.replace(/(.*)\/(.*)$/,'$2');
+    console.log(`${fileName}找到多个匹配配置，优先选择第一个,假如选择的不是你想要的，请更改你的匹配规则，使其更加精确`);
     e.subtitle = `资源匹配到多个代理规则,可能匹配出错,请细化规则`;
     e.message = `点击访问${fileName}}`;
-    e.open = urlString
+    e.open = `${httpsOptions.protocol}//${httpsOptions.hostname}/${httpsOptions.path}`
     showMessage.warnning(e);
     return configMatched[0].fileData
   }
@@ -645,7 +610,7 @@ const paramModifyForConfig =  (fileName, data) => {
     // fs.w
     fs.writeFile(configFileAddress, strPrend + v, function (err) {
       if (err) {
-        console.log('There has been an error saving your configuration data.');
+        console.log('There has an error saving your configuration data.');
         console.log(err.message);
         reject("failure")
         return;
@@ -662,8 +627,8 @@ exports.matchResource = matchResource;
 exports.isUrlNeedRequestLocal = isMatchConfig;
 exports.requestRealTarget = requestRealTarget;
 exports.createOptionsForLocalRequest = createOptionsForLocalRequest;
-exports.createOptionFromCli = createOptionFromCli;
-exports.createOptionsFromCustomRule = createOptionsFromCustomRule;
+exports.readFileDataByName = readFileDataByName;
+exports.updateRequestOptionsByCustomRules = updateRequestOptionsByCustomRules;
 exports.getUrlFromOptions = getUrlFromOptions;
 exports.showMessage = showMessage;
 exports.configsManage = configsManage;

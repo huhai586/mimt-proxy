@@ -9,7 +9,7 @@ const {
   requestRealTarget,
   createOptionsForLocalRequest,
   createOptionsFromCustomRule,
-  getProxyRule
+  getProxyRule, updateRequestOptionsByConfig, updateRequestOptionsByCustomRules
 } = require('./utils');
 const caCertPath = path.join(__dirname, '../rootCA/rootCA.crt');
 const caKeyPath = path.join(__dirname, '../rootCA/rootCA.key.pem');
@@ -77,20 +77,19 @@ function createFakeHttpsWebSite(domain, successFun) {
     };
     let urlStr = `${httpsOptions.protocol}//${httpsOptions.hostname}${httpsOptions.path}`;
 
-    const matchConfig = getProxyRule(urlStr);
-      // excludePattern, includePattern, customProxyRules, proxyedHostname
+    const matchConfig = getProxyRule(httpsOptions);
     if (matchConfig) {
       // 有匹配的proxy文件
-      const {customProxyRules, excludePattern, includePattern } = matchConfig;
-      httpsOptions = createOptionsFromCustomRule(httpsOptions,req.url,customProxyRules, excludePattern, includePattern);
-      req.url = httpsOptions.path;
-      // 由于做了customRule判断，可能导致
+      if (Array.isArray(matchConfig.requestMiddleware)) {
+        httpsOptions = updateRequestOptionsByCustomRules(httpsOptions,matchConfig);
+        req.url = httpsOptions.path;
+      }
+
       readyRequest(httpsOptions,matchConfig,res,req)
     } else {
       //  无匹配的proxy文件
       console.log("无match配置文件，直接请求地址: ",urlStr)
       requestRealTarget(httpsOptions, req, res, false)
-      return;
     }
   });
   fakeServer.on('error', (e) => {
@@ -98,20 +97,17 @@ function createFakeHttpsWebSite(domain, successFun) {
   });
 
 }
+
+
 function readyRequest(httpsOptions,matchConfig,res,req){
-  const {excludePattern,includePattern} = matchConfig;
-  const urlNeedRequestLocal = isUrlNeedRequestLocal(
-    httpsOptions.hostname,
-    httpsOptions.path,
-    excludePattern,
-    includePattern,
-    matchConfig,
-  );
+  const {localServerHostName} = matchConfig;
+  //如果hostname没有被修改(byPass)，那么请求本地
+  const urlNeedRequestLocal = httpsOptions.hostname === req.headers.host;
 
   if (urlNeedRequestLocal) {
-    requestWebpackDevServer(createOptionsForLocalRequest(matchConfig.localServerHostName), res, req);
+    requestWebpackDevServer(createOptionsForLocalRequest(localServerHostName), res, req);
   } else {
-    console.log("当前请求不需要走本地")
+    console.log("当前请求不走本地，最终地址为", httpsOptions);
     const isHttp = httpsOptions.protocol === 'http:';
     httpsOptions.headers.host = httpsOptions.hostname;
     requestRealTarget(httpsOptions, req, res, isHttp)

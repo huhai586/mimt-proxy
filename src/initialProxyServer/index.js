@@ -1,17 +1,18 @@
 
 const http = require('http');
-const {createOptionFromCli,getProxyRule,configsManage} = require('./utils');
+const {createOptionFromCli,getProxyRule,configsManage, readFileDataByName} = require('./utils');
 const {extractIPFromAdrInfo}= require("../common/utils");
 const {accessDeveiceManage} = require("../common/helper");
 const ProxyForHttp = require("./proxy-for-http");
 const ProxyForHttps = require("./proxy-for-https");
+const url = require("url");
 
 let httpMitmProxy;
 
 const selectConfig = (configObject, selectConfigCallBack, port) => {
   let initOptions;
    try {
-     initOptions = createOptionFromCli(configObject.configName);
+     initOptions = readFileDataByName(configObject.configName);
    } catch (e) {
      selectConfigCallBack({startSuc: false, msg:`新配置文件${configObject.configName}无法被正常选择.${e}`});
      return
@@ -45,7 +46,17 @@ const startProxyServer = (startUpCallBack, port = 6789) => {
     const ip =extractIPFromAdrInfo(req.socket.remoteAddress);
     (ip !== '::1') && accessDeveiceManage.add(ip)
 
-    ProxyForHttp(req,res,getProxyRule(req.url));
+    let urlObject = url.parse(req.url);
+    let httpOptions =  {
+      protocol: 'http:',
+      hostname: req.headers.host.split(':')[0],
+      method: req.method,
+      port: req.headers.host.split(':')[1] || 80,
+      path: urlObject.path,
+      headers: req.headers,
+    };
+
+    ProxyForHttp(req,res,getProxyRule(httpOptions), httpOptions);
     res.on('error', () => {
       console.log('😩响应异常中断')
     })

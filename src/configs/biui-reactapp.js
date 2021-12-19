@@ -15,6 +15,12 @@
     ],
 
     "localServerHostName": "http://localhost:8003",
-    "customProxyRules": [],
+    "requestMiddleware": [
+      {
+        "originUrlPathFragment": "/poor/",
+        "fragmentTransformer": () => {return 'xxxx'},
+        "route2Host": ""
+      }
+    ],
     "enable": true
 }
