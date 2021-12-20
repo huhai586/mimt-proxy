@@ -364,21 +364,20 @@ const readFileDataByName = (configName) => {
 }
 
 
-const isRegExp = (str) => {
-  try {
-    new RegExp(str)
-  } catch (e) {
-    return false
-  }
-  return true
+const isRegExp = (RegExpValue) => {
+  return RegExpValue instanceof RegExp
 }
 
 const getIsPathMatch = (pathString, pathMatchRule) => {
   if (isRegExp(pathMatchRule)) {
-    return (new RegExp(pathMatchRule)).test(pathString)
+    return (pathMatchRule).test(pathString)
   } else {
     return pathString.indexOf(pathMatchRule) !== -1
   }
+}
+
+const escapeRegex = (string) => {
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 /**
  * 解析customeRule
@@ -389,13 +388,9 @@ const updateRequestOptionsByCustomRules = (originOptions, config) => {
 
   config.requestMiddleware.some((ruleObj) => {
     const {originUrlPathFragment, fragmentTransformer, route2Host} = ruleObj;
-    let pathMatchRule = '';
 
-    if (isRegExp(originUrlPathFragment)) {
-      pathMatchRule = new RegExp(originUrlPathFragment)
-    } else {
-      pathMatchRule = originUrlPathFragment
-    }
+    let pathMatchRule = originUrlPathFragment;
+
     const isPathMatch = getIsPathMatch(optionsTemp.path, pathMatchRule);
 
     if (isPathMatch) {
@@ -601,7 +596,7 @@ const paramModifyForConfig =  (fileName, data) => {
  * @includePattern regexp|string[] hostname下 请求资源url path必须include 相应字段才能被代理到本地
  * @localServerHostName string 本地资源服务器hostname
  
- * @proxyedHostname string 只对只对指定hostname的资源进行本地请求
+
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/

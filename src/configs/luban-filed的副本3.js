@@ -3,7 +3,6 @@
  * @includePattern regexp|string[] hostname下 请求资源url path必须include 相应字段才能被代理到本地
  * @localServerHostName string 本地资源服务器hostname
 
- * @proxyedHostname string 只对只对指定hostname的资源进行本地请求
  * @customProxyRules rule{}[] 用户自定义代理规则，可以自定义hostname下的资源请求规则
  *
  * **/
@@ -19,12 +18,12 @@
     ],
    "includeMatchStrategy": "some",
     "localServerHostName": "http://localhost:3007",
-    "proxyedHostname": "tcdn.bstatics.com",
     "requestMiddleware": [
       {
-        "originUrlPathFragment": "1.0.66",
+        "originUrlPathFragment": /([\d]+\.[\d]+\.[\d]+)/g,
+        // "originUrlPathFragment": "1.0.66",
         "fragmentTransformer": (a,b,c,d) => {
-          return 'xxxx'
+          return ''
         },
         "route2Host": ""
       }
