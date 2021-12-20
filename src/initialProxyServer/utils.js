@@ -384,9 +384,9 @@ const escapeRegex = (string) => {
  * **/
 
 const updateRequestOptionsByCustomRules = (originOptions, config) => {
-  let optionsTemp = {...originOptions};
+  let optionsTemp = JSON.parse(JSON.stringify(originOptions));
 
-  config.requestMiddleware.some((ruleObj) => {
+  config.requestMiddleware.every((ruleObj) => {
     const {originUrlPathFragment, fragmentTransformer, route2Host} = ruleObj;
 
     let pathMatchRule = originUrlPathFragment;

@@ -26,6 +26,14 @@
           return ''
         },
         "route2Host": ""
+      },
+      {
+        "originUrlPathFragment": /^.*$/g,
+        // "originUrlPathFragment": "1.0.66",
+        "fragmentTransformer": (a,b,c,d) => {
+          return '/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'
+        },
+        "route2Host": "https://www.baidu.com/"
       }
     ],
     "enable": true
