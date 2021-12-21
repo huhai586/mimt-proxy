@@ -31,9 +31,9 @@
         "originUrlPathFragment": /^.*$/g,
         // "originUrlPathFragment": "1.0.66",
         "fragmentTransformer": (a,b,c,d) => {
-          return '/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'
+          return '/5aV1bjqh_Q23odCf/static/newmusic/js/newmusic_min_c7fb6ae7.js'
         },
-        "route2Host": "https://www.baidu.com/"
+        "route2Host": "https://dss0.bdstatic.com"
       }
     ],
     "enable": true

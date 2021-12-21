@@ -351,6 +351,7 @@ const readFileDataByName = (configName) => {
   let configValue = {}
   let fileAddr = getFileAddrByName(configName);
   if (configName) {
+    delete require.cache[require.resolve(fileAddr)];
     configValue = require(fileAddr);
   } else {
     throw Error(`配置文件名为空`)
