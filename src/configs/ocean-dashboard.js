@@ -14,7 +14,7 @@
     "excludePattern": [
     ],
     "includePattern": [
-        'ocean-dashboard-page',"ChartSkeleton","images"
+        'ocean-dashboard-page',"ChartSkeleton","images", "FriendlyPrompt"
     ],
    "includeMatchStrategy": "some",
    "localServerHostName": "http://localhost:3008",

@@ -14,7 +14,7 @@
         "monaco"
     ],
     "includePattern": [
-        'ocean-mobile-report-detail-page','huhai112'
+        'ocean-mobile-report-detail-page','images'
     ],
    "includeMatchStrategy": "some",
     "localServerHostName": "http://localhost:3007",
@@ -27,14 +27,7 @@
         },
         "route2Host": ""
       },
-      {
-        "originUrlPathFragment": /^.*$/g,
-        // "originUrlPathFragment": "1.0.66",
-        "fragmentTransformer": (a,b,c,d) => {
-          return '/5aV1bjqh_Q23odCf/static/newmusic/js/newmusic_min_c7fb6ae7.js'
-        },
-        "route2Host": "https://dss0.bdstatic.com"
-      }
+
     ],
     "enable": true
 }

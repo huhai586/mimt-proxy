@@ -19,6 +19,13 @@
     ],
     "localServerHostName": "http://localhost:3004",
     "proxyedHostname": "tcdn.bstatics.com",
-    "customProxyRules": [],
+   "requestMiddleware": [
+     {
+       "originUrlPathFragment": /([\d]+\.[\d]+\.[\d]+)/g,
+       "fragmentTransformer": (a,b,c,d) => {
+         return ''
+       }
+     }
+   ],
     "enable": true
 }
