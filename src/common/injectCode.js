@@ -1,3 +1,4 @@
+//-----------------------------注入的自定义代码开始---------------------------
 var  uniqClass = '--b-proxy-cli-proxy-tip';
 window.BProoxyCliTipFunc = function(){
   var tip = document.querySelector(uniqClass);
@@ -13,3 +14,4 @@ window.BProoxyCliTipFunc = function(){
 
 window.removeEventListener("load", window.BProoxyCliTipFunc);
 window.addEventListener("load", window.BProoxyCliTipFunc);
+//-----------------------------注入的自定义代码结束---------------------------
