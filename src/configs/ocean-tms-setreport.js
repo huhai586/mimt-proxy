@@ -13,13 +13,32 @@
     "includePattern": [
         "tms-setreport/release/app"
     ],
-    "localServerHostName": "http://localhost:8002",
+    "localServerHostName": "http://localhost:8000",
     "proxyedHostname": "stnew03.beisen.com",
-    "customProxyRules": [
-        {
-            "pathRewriteRule": "/ux/tms-setreport/release/app(.*)",
-            "byPass": "http://localhost:8000"
-        }
-    ],
-    "enable": false
+     "requestMiddleware": [
+         {
+             "originUrlPathFragment": /\/ux\/tms-setreport\/release/g,
+             // "originUrlPathFragment": "1.0.66",
+             "fragmentTransformer": (a,b,c,d) => {
+                 return ''
+                 // // -2203071419.min
+                 // console.log({a,b,c,d})
+                 // const originStr = c;
+                 // return originStr.replace("/ux/tms-setreport/release", '').replace(/-[\d]+\.min/, '')
+             },
+             "route2Host": "http://localhost:8000"
+         },
+
+         {
+             "originUrlPathFragment": /-[\d]+\.min/,
+             // "originUrlPathFragment": "1.0.66",
+             "fragmentTransformer": (a,b,c,d) => {
+                 return ''
+
+             },
+
+         },
+
+     ],
+    "enable": true
 }

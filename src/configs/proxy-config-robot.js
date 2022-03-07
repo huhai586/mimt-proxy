@@ -24,5 +24,5 @@
             "pathRewriteRule": "main-2.0.8.min main.chunk"
         }
     ],
-    "enable": true
+    "enable": false
 }

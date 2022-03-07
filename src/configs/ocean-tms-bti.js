@@ -13,7 +13,7 @@
     "includePattern": [
         "tms-bti/release/app"
     ],
-    "localServerHostName": "http://localhost:8002",
+    "localServerHostName": "http://localhost:8000",
     "proxyedHostname": "stnew03.beisen.com",
     "customProxyRules": [
         {
@@ -22,7 +22,7 @@
               const replaceExtraStr= originParam.replace('/ux/tms-bti/release','').replace(/-\d+\.min/,'')
               return replaceExtraStr
             },
-            "byPass": "http://localhost:8002"
+            "byPass": "http://localhost:8000"
         }
     ],
     "enable": true
